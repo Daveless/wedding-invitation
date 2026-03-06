@@ -1,0 +1,513 @@
+'use client'
+
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+
+interface Guest {
+    id: string
+    name: string
+    token: string
+    created_at: string
+}
+
+interface RSVP {
+    id: string
+    guest_id: string
+    attending: boolean
+    comments: string | null
+    submitted_at: string
+    guests?: { name: string } | null
+}
+
+interface SongReq {
+    id: string
+    guest_id: string
+    song: string
+    submitted_at: string
+    guests?: { name: string } | null
+}
+
+interface AdminClientProps {
+    guests: Guest[]
+    rsvps: RSVP[]
+    songs: SongReq[]
+    rsvpMap: Record<string, boolean>
+}
+
+export default function AdminClient({ guests, rsvps, songs, rsvpMap }: AdminClientProps) {
+    const [activeTab, setActiveTab] = useState<'guests' | 'rsvp' | 'songs'>('guests')
+    const [newName, setNewName] = useState('')
+    const [adding, setAdding] = useState(false)
+    const [localGuests, setLocalGuests] = useState<Guest[]>(guests)
+    const [copied, setCopied] = useState<string | null>(null)
+    const [addError, setAddError] = useState('')
+    const router = useRouter()
+
+    const handleLogout = () => {
+        document.cookie = 'admin_session=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/'
+        router.push('/admin/login')
+    }
+
+    const handleAddGuest = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!newName.trim()) return
+        setAdding(true)
+        setAddError('')
+        const res = await fetch('/api/admin/guests', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: newName.trim() }),
+        })
+        if (res.ok) {
+            const { guest } = await res.json()
+            setLocalGuests(prev => [guest, ...prev])
+            setNewName('')
+        } else {
+            const { error } = await res.json()
+            setAddError(error || 'Error al agregar invitado')
+        }
+        setAdding(false)
+    }
+
+    const copyText = (text: string, id: string) => {
+        navigator.clipboard.writeText(text)
+        setCopied(id)
+        setTimeout(() => setCopied(null), 2000)
+    }
+
+    const confirmedCount = rsvps.filter(r => r.attending).length
+    const declinedCount = rsvps.filter(r => !r.attending).length
+    const pendingCount = localGuests.length - rsvps.length
+
+    const tabs = [
+        { id: 'guests' as const, label: 'Invitados', count: localGuests.length },
+        { id: 'rsvp' as const, label: 'Confirmaciones', count: rsvps.length },
+        { id: 'songs' as const, label: 'Playlist', count: songs.length },
+    ]
+
+    return (
+        <div style={{ minHeight: '100vh', background: '#0f172a', fontFamily: "'Inter', system-ui, sans-serif" }}>
+            {/* Sidebar */}
+            <div style={{ display: 'flex', minHeight: '100vh' }}>
+                <aside style={{
+                    width: '240px', background: '#0a1020',
+                    borderRight: '1px solid rgba(201,168,76,0.15)',
+                    display: 'flex', flexDirection: 'column',
+                    padding: '0',
+                    flexShrink: 0,
+                }}>
+                    {/* Brand */}
+                    <div style={{
+                        padding: '1.5rem',
+                        borderBottom: '1px solid rgba(201,168,76,0.15)',
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.25rem' }}>
+                            <svg width="18" height="18" viewBox="0 0 18 18">
+                                <polygon points="9,1 11,6.5 17,6.5 12.5,10 14,17 9,13 4,17 5.5,10 1,6.5 7,6.5" fill="#c9a84c" />
+                            </svg>
+                            <span style={{ fontWeight: 700, color: '#c9a84c', fontSize: '0.95rem', letterSpacing: '0.05em' }}>
+                                Brenda & David
+                            </span>
+                        </div>
+                        <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.72rem', marginLeft: '1.6rem' }}>
+                            Panel de Administración
+                        </p>
+                    </div>
+
+                    {/* Nav */}
+                    <nav style={{ flex: 1, padding: '1rem 0.75rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                        {tabs.map(tab => (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id)}
+                                style={{
+                                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                    padding: '0.6rem 0.75rem',
+                                    borderRadius: '6px',
+                                    border: 'none',
+                                    background: activeTab === tab.id ? 'rgba(201,168,76,0.12)' : 'transparent',
+                                    color: activeTab === tab.id ? '#c9a84c' : 'rgba(255,255,255,0.55)',
+                                    cursor: 'pointer',
+                                    fontSize: '0.85rem',
+                                    fontWeight: activeTab === tab.id ? 600 : 400,
+                                    textAlign: 'left',
+                                    transition: 'all 0.15s',
+                                    width: '100%',
+                                }}
+                            >
+                                <span>{tab.label}</span>
+                                <span style={{
+                                    background: activeTab === tab.id ? 'rgba(201,168,76,0.2)' : 'rgba(255,255,255,0.08)',
+                                    color: activeTab === tab.id ? '#c9a84c' : 'rgba(255,255,255,0.35)',
+                                    borderRadius: '10px', padding: '0.05rem 0.45rem',
+                                    fontSize: '0.72rem', fontWeight: 600,
+                                }}>
+                                    {tab.count}
+                                </span>
+                            </button>
+                        ))}
+                    </nav>
+
+                    {/* Logout */}
+                    <div style={{ padding: '1rem 0.75rem', borderTop: '1px solid rgba(201,168,76,0.1)' }}>
+                        <button
+                            onClick={handleLogout}
+                            style={{
+                                width: '100%', padding: '0.6rem 0.75rem',
+                                background: 'transparent', border: '1px solid rgba(255,255,255,0.1)',
+                                color: 'rgba(255,255,255,0.4)', borderRadius: '6px',
+                                cursor: 'pointer', fontSize: '0.8rem', transition: 'all 0.15s',
+                            }}
+                            aria-label="Cerrar sesión"
+                        >
+                            Cerrar sesión
+                        </button>
+                    </div>
+                </aside>
+
+                {/* Main content */}
+                <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                    {/* Top bar */}
+                    <header style={{
+                        padding: '1.25rem 2rem',
+                        borderBottom: '1px solid rgba(255,255,255,0.06)',
+                        background: '#0f172a',
+                    }}>
+                        <h1 style={{ color: '#f8fafc', fontSize: '1.1rem', fontWeight: 600, margin: 0 }}>
+                            {tabs.find(t => t.id === activeTab)?.label}
+                        </h1>
+                    </header>
+
+                    <div style={{ flex: 1, overflowY: 'auto', padding: '2rem' }}>
+
+                        {/* ─── STATS (always visible) ─── */}
+                        <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
+                            {[
+                                { label: 'Total invitados', value: localGuests.length, color: '#c9a84c' },
+                                { label: 'Asistirán ✓', value: confirmedCount, color: '#4ade80' },
+                                { label: 'No asisten ✗', value: declinedCount, color: '#f87171' },
+                                { label: 'Sin respuesta', value: pendingCount, color: '#94a3b8' },
+                            ].map(stat => (
+                                <div key={stat.label} style={{
+                                    background: '#1e293b',
+                                    border: '1px solid rgba(255,255,255,0.06)',
+                                    borderRadius: '10px',
+                                    padding: '1rem 1.25rem',
+                                    minWidth: '130px',
+                                    flex: '1 1 120px',
+                                }}>
+                                    <div style={{ fontSize: '1.75rem', fontWeight: 700, color: stat.color, lineHeight: 1 }}>
+                                        {stat.value}
+                                    </div>
+                                    <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', marginTop: '0.3rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                        {stat.label}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* ─── GUESTS TAB ─── */}
+                        {activeTab === 'guests' && (
+                            <div>
+                                {/* Add guest */}
+                                <div style={{
+                                    background: '#1e293b',
+                                    borderRadius: '10px',
+                                    padding: '1.25rem 1.5rem',
+                                    marginBottom: '1.5rem',
+                                    border: '1px solid rgba(255,255,255,0.06)',
+                                }}>
+                                    <h2 style={{ color: '#f8fafc', fontSize: '0.9rem', fontWeight: 600, marginBottom: '1rem' }}>
+                                        Agregar invitado
+                                    </h2>
+                                    <form onSubmit={handleAddGuest} style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                                        <input
+                                            type="text"
+                                            value={newName}
+                                            onChange={e => setNewName(e.target.value)}
+                                            placeholder="Nombre completo del invitado"
+                                            aria-label="Nombre del nuevo invitado"
+                                            style={{
+                                                flex: 1, minWidth: '200px',
+                                                padding: '0.6rem 0.875rem',
+                                                background: '#0f172a',
+                                                border: '1px solid rgba(255,255,255,0.12)',
+                                                borderRadius: '6px',
+                                                color: '#f8fafc',
+                                                fontSize: '0.875rem',
+                                                outline: 'none',
+                                            }}
+                                        />
+                                        <button
+                                            type="submit"
+                                            disabled={adding || !newName.trim()}
+                                            aria-label="Agregar invitado"
+                                            style={{
+                                                padding: '0.6rem 1.25rem',
+                                                background: adding || !newName.trim() ? '#334155' : '#c9a84c',
+                                                color: adding || !newName.trim() ? 'rgba(255,255,255,0.3)' : '#0a1020',
+                                                border: 'none', borderRadius: '6px',
+                                                fontWeight: 600, fontSize: '0.875rem',
+                                                cursor: adding || !newName.trim() ? 'not-allowed' : 'pointer',
+                                                whiteSpace: 'nowrap',
+                                                transition: 'all 0.15s',
+                                            }}
+                                        >
+                                            {adding ? 'Agregando...' : '+ Agregar'}
+                                        </button>
+                                    </form>
+                                    {addError && (
+                                        <p style={{ color: '#f87171', fontSize: '0.8rem', marginTop: '0.5rem' }}>{addError}</p>
+                                    )}
+                                </div>
+
+                                {/* Guests table */}
+                                <div style={{
+                                    background: '#1e293b',
+                                    borderRadius: '10px',
+                                    border: '1px solid rgba(255,255,255,0.06)',
+                                    overflow: 'hidden',
+                                }}>
+                                    <div style={{ overflowX: 'auto' }}>
+                                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                                            <thead>
+                                                <tr style={{ background: 'rgba(255,255,255,0.03)' }}>
+                                                    {['Nombre', 'Estado RSVP', 'Link de invitación', 'Fecha'].map(h => (
+                                                        <th key={h} style={{
+                                                            padding: '0.75rem 1rem',
+                                                            textAlign: 'left',
+                                                            color: 'rgba(255,255,255,0.4)',
+                                                            fontWeight: 500,
+                                                            fontSize: '0.72rem',
+                                                            textTransform: 'uppercase',
+                                                            letterSpacing: '0.07em',
+                                                            borderBottom: '1px solid rgba(255,255,255,0.06)',
+                                                        }}>
+                                                            {h}
+                                                        </th>
+                                                    ))}
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {localGuests.map((g, i) => {
+                                                    const link = `${typeof window !== 'undefined' ? window.location.origin : ''}/invite/${g.token}`
+                                                    const hasRsvp = g.id in rsvpMap
+                                                    return (
+                                                        <tr
+                                                            key={g.id}
+                                                            style={{ borderBottom: i < localGuests.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}
+                                                        >
+                                                            <td style={{ padding: '0.875rem 1rem', color: '#f1f5f9', fontWeight: 500 }}>
+                                                                {g.name}
+                                                            </td>
+                                                            <td style={{ padding: '0.875rem 1rem' }}>
+                                                                {hasRsvp ? (
+                                                                    <span style={{
+                                                                        display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
+                                                                        padding: '0.2rem 0.6rem',
+                                                                        borderRadius: '20px',
+                                                                        background: rsvpMap[g.id] ? 'rgba(74,222,128,0.12)' : 'rgba(248,113,113,0.12)',
+                                                                        color: rsvpMap[g.id] ? '#4ade80' : '#f87171',
+                                                                        fontSize: '0.78rem', fontWeight: 500,
+                                                                    }}>
+                                                                        {rsvpMap[g.id] ? '✓ Asistirá' : '✗ No asiste'}
+                                                                    </span>
+                                                                ) : (
+                                                                    <span style={{
+                                                                        display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
+                                                                        padding: '0.2rem 0.6rem',
+                                                                        borderRadius: '20px',
+                                                                        background: 'rgba(148,163,184,0.1)',
+                                                                        color: 'rgba(148,163,184,0.6)',
+                                                                        fontSize: '0.78rem',
+                                                                    }}>
+                                                                        Pendiente
+                                                                    </span>
+                                                                )}
+                                                            </td>
+                                                            <td style={{ padding: '0.875rem 1rem' }}>
+                                                                <button
+                                                                    onClick={() => copyText(link, g.id)}
+                                                                    aria-label={`Copiar link de ${g.name}`}
+                                                                    style={{
+                                                                        display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
+                                                                        padding: '0.3rem 0.7rem',
+                                                                        background: copied === g.id ? 'rgba(74,222,128,0.12)' : 'rgba(201,168,76,0.1)',
+                                                                        border: `1px solid ${copied === g.id ? 'rgba(74,222,128,0.3)' : 'rgba(201,168,76,0.25)'}`,
+                                                                        borderRadius: '5px',
+                                                                        color: copied === g.id ? '#4ade80' : '#c9a84c',
+                                                                        fontSize: '0.78rem',
+                                                                        cursor: 'pointer',
+                                                                        transition: 'all 0.15s',
+                                                                        fontWeight: 500,
+                                                                    }}
+                                                                >
+                                                                    {copied === g.id ? '✓ Copiado' : '🔗 Copiar link'}
+                                                                </button>
+                                                            </td>
+                                                            <td style={{ padding: '0.875rem 1rem', color: 'rgba(255,255,255,0.3)', fontSize: '0.78rem' }}>
+                                                                {new Date(g.created_at).toLocaleDateString('es-EC', { day: '2-digit', month: 'short' })}
+                                                            </td>
+                                                        </tr>
+                                                    )
+                                                })}
+                                                {localGuests.length === 0 && (
+                                                    <tr>
+                                                        <td colSpan={4} style={{ padding: '3rem', textAlign: 'center', color: 'rgba(255,255,255,0.25)', fontStyle: 'italic' }}>
+                                                            No hay invitados aún. Agrega el primero arriba.
+                                                        </td>
+                                                    </tr>
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* ─── RSVP TAB ─── */}
+                        {activeTab === 'rsvp' && (
+                            <div style={{
+                                background: '#1e293b',
+                                borderRadius: '10px',
+                                border: '1px solid rgba(255,255,255,0.06)',
+                                overflow: 'hidden',
+                            }}>
+                                <div style={{ overflowX: 'auto' }}>
+                                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                                        <thead>
+                                            <tr style={{ background: 'rgba(255,255,255,0.03)' }}>
+                                                {['Invitado', '¿Asiste?', 'Comentarios', 'Fecha de respuesta'].map(h => (
+                                                    <th key={h} style={{
+                                                        padding: '0.75rem 1rem',
+                                                        textAlign: 'left',
+                                                        color: 'rgba(255,255,255,0.4)',
+                                                        fontWeight: 500,
+                                                        fontSize: '0.72rem',
+                                                        textTransform: 'uppercase',
+                                                        letterSpacing: '0.07em',
+                                                        borderBottom: '1px solid rgba(255,255,255,0.06)',
+                                                    }}>
+                                                        {h}
+                                                    </th>
+                                                ))}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {rsvps.map((r, i) => (
+                                                <tr key={r.id} style={{ borderBottom: i < rsvps.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}>
+                                                    <td style={{ padding: '0.875rem 1rem', color: '#f1f5f9', fontWeight: 500 }}>
+                                                        {(r.guests as { name: string } | null)?.name || '—'}
+                                                    </td>
+                                                    <td style={{ padding: '0.875rem 1rem' }}>
+                                                        <span style={{
+                                                            display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
+                                                            padding: '0.2rem 0.65rem',
+                                                            borderRadius: '20px',
+                                                            background: r.attending ? 'rgba(74,222,128,0.12)' : 'rgba(248,113,113,0.12)',
+                                                            color: r.attending ? '#4ade80' : '#f87171',
+                                                            fontSize: '0.78rem', fontWeight: 600,
+                                                        }}>
+                                                            {r.attending ? '✓ Sí' : '✗ No'}
+                                                        </span>
+                                                    </td>
+                                                    <td style={{
+                                                        padding: '0.875rem 1rem',
+                                                        color: 'rgba(255,255,255,0.55)',
+                                                        fontSize: '0.82rem',
+                                                        maxWidth: '240px',
+                                                        whiteSpace: 'nowrap',
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                    }}>
+                                                        {r.comments || <span style={{ color: 'rgba(255,255,255,0.2)' }}>Sin comentarios</span>}
+                                                    </td>
+                                                    <td style={{ padding: '0.875rem 1rem', color: 'rgba(255,255,255,0.3)', fontSize: '0.78rem' }}>
+                                                        {new Date(r.submitted_at).toLocaleDateString('es-EC', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                            {rsvps.length === 0 && (
+                                                <tr>
+                                                    <td colSpan={4} style={{ padding: '3rem', textAlign: 'center', color: 'rgba(255,255,255,0.25)', fontStyle: 'italic' }}>
+                                                        Sin confirmaciones aún
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* ─── SONGS TAB ─── */}
+                        {activeTab === 'songs' && (
+                            <div style={{
+                                background: '#1e293b',
+                                borderRadius: '10px',
+                                border: '1px solid rgba(255,255,255,0.06)',
+                                overflow: 'hidden',
+                            }}>
+                                {songs.length === 0 ? (
+                                    <div style={{ padding: '3rem', textAlign: 'center', color: 'rgba(255,255,255,0.25)', fontStyle: 'italic' }}>
+                                        Sin canciones aún
+                                    </div>
+                                ) : (
+                                    <div>
+                                        {/* Header */}
+                                        <div style={{
+                                            padding: '1rem 1.5rem',
+                                            borderBottom: '1px solid rgba(255,255,255,0.06)',
+                                            display: 'flex', alignItems: 'center', gap: '0.5rem',
+                                        }}>
+                                            <span style={{ fontSize: '1rem' }}>🎵</span>
+                                            <span style={{ color: '#f1f5f9', fontWeight: 600, fontSize: '0.9rem' }}>
+                                                Setlist — {songs.length} canciones
+                                            </span>
+                                        </div>
+                                        {/* Song rows */}
+                                        {songs.map((s_item, i) => (
+                                            <div
+                                                key={s_item.id}
+                                                style={{
+                                                    display: 'flex', alignItems: 'center', gap: '1rem',
+                                                    padding: '0.875rem 1.5rem',
+                                                    borderBottom: i < songs.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+                                                }}
+                                            >
+                                                <span style={{
+                                                    width: '28px', height: '28px', borderRadius: '50%',
+                                                    background: 'rgba(201,168,76,0.1)',
+                                                    border: '1px solid rgba(201,168,76,0.2)',
+                                                    color: '#c9a84c',
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                    fontSize: '0.72rem', fontWeight: 700, flexShrink: 0,
+                                                }}>
+                                                    {String(i + 1).padStart(2, '0')}
+                                                </span>
+                                                <span style={{ color: '#f1f5f9', flex: 1, fontSize: '0.9rem' }}>
+                                                    {s_item.song}
+                                                </span>
+                                                <span style={{
+                                                    color: 'rgba(255,255,255,0.3)',
+                                                    fontSize: '0.78rem',
+                                                    fontStyle: 'italic',
+                                                    flexShrink: 0,
+                                                }}>
+                                                    {(s_item.guests as { name: string } | null)?.name || '?'}
+                                                </span>
+                                                <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.72rem', flexShrink: 0 }}>
+                                                    {new Date(s_item.submitted_at).toLocaleDateString('es-EC', { day: '2-digit', month: 'short' })}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </main>
+            </div>
+        </div>
+    )
+}
