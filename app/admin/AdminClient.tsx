@@ -16,7 +16,7 @@ interface RSVP {
     attending: boolean
     comments: string | null
     submitted_at: string
-    guests?: { name: string } | null
+    guests?: { name: string } | { name: string }[] | any
 }
 
 interface SongReq {
@@ -24,7 +24,7 @@ interface SongReq {
     guest_id: string
     song: string
     submitted_at: string
-    guests?: { name: string } | null
+    guests?: { name: string } | { name: string }[] | any
 }
 
 interface AdminClientProps {
@@ -397,7 +397,7 @@ export default function AdminClient({ guests, rsvps, songs, rsvpMap }: AdminClie
                                             {rsvps.map((r, i) => (
                                                 <tr key={r.id} style={{ borderBottom: i < rsvps.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}>
                                                     <td style={{ padding: '0.875rem 1rem', color: '#f1f5f9', fontWeight: 500 }}>
-                                                        {(r.guests as { name: string } | null)?.name || '—'}
+                                                        {(Array.isArray(r.guests) ? r.guests[0]?.name : r.guests?.name) || '—'}
                                                     </td>
                                                     <td style={{ padding: '0.875rem 1rem' }}>
                                                         <span style={{
@@ -494,7 +494,7 @@ export default function AdminClient({ guests, rsvps, songs, rsvpMap }: AdminClie
                                                     fontStyle: 'italic',
                                                     flexShrink: 0,
                                                 }}>
-                                                    {(s_item.guests as { name: string } | null)?.name || '?'}
+                                                    {(Array.isArray(s_item.guests) ? s_item.guests[0]?.name : s_item.guests?.name) || '?'}
                                                 </span>
                                                 <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.72rem', flexShrink: 0 }}>
                                                     {new Date(s_item.submitted_at).toLocaleDateString('es-EC', { day: '2-digit', month: 'short' })}
