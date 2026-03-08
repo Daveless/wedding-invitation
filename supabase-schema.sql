@@ -66,3 +66,20 @@ create policy "Allow anon insert songs"
 -- insert into guests (name) values ('Carlos López');
 -- After inserting, copy the token from the guests table
 -- and visit: /invite/{token}
+
+-- ============================================================
+-- 4. TRANSPORT REQUESTS TABLE
+-- ============================================================
+create table if not exists transport_requests (
+  id uuid primary key default gen_random_uuid(),
+  guest_id uuid references guests(id) on delete cascade,
+  needs_transport boolean not null default true,
+  submitted_at timestamptz default now()
+);
+
+alter table transport_requests enable row level security;
+
+create policy "Allow anon insert transport"
+  on transport_requests for insert
+  to anon
+  with check (true);

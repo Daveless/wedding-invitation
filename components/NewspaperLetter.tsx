@@ -6,6 +6,8 @@ import RSVPForm from './RSVPForm'
 import SongRequest from './SongRequest'
 import Countdown from './Countdown'
 import { useTranslation } from 'react-i18next'
+import { Bus } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
 
 interface Props {
     guestName: string
@@ -35,6 +37,13 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
     const [showBank, setShowBank] = useState(false)
     const [needsTransport, setNeedsTransport] = useState(false)
     const [transportSaved, setTransportSaved] = useState(false)
+
+    const handleTransportClick = async () => {
+        setNeedsTransport(true)
+        setTransportSaved(true)
+        // Fire and forget insert to Supabase
+        await supabase.from('transport_requests').insert({ guest_id: guestId, needs_transport: true })
+    }
 
     const toggleLanguage = () => {
         i18n.changeLanguage(i18n.language === 'es' ? 'en' : 'es')
@@ -85,12 +94,13 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                     <p style={{
                         fontFamily: 'var(--font-birthstone)',
                         color: '#fff',
-                        fontSize: 'clamp(3.5rem, 14vw, 6rem)',
+                        fontSize: 'clamp(3.5rem, 14vw, 5rem)',
+                        textAlign: 'left',
                         lineHeight: 1,
                         textShadow: '0 2px 20px rgba(0,0,0,0.5)',
                         letterSpacing: '0.03em',
                     }}>
-                        David y Brenda
+                        David & Brenda
                     </p>
                     <p style={{
                         fontFamily: "'Libre Caslon Display', serif",
@@ -154,12 +164,12 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                 ───────────────────────────────────────── */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem', position: 'relative' }}>
                     {/* Left corner flourish */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', opacity: 0.55, lineHeight: 1, margin: '-10px' }}>
-                        <img src="/adorno-esquina-2.png" alt="" style={{ width: '320px', height: 'auto', position: 'absolute', left: '-25px' }} />
+                    <div style={{ position: 'absolute', left: '-25px', top: '-10px', opacity: 0.55, zIndex: 0 }}>
+                        <img src="/adorno-esquina-2.png" alt="" style={{ width: '40vw', maxWidth: '320px', height: 'auto' }} />
                     </div>
 
                     {/* Right: "Guarda la fecha" box */}
-                    <div style={{ flexShrink: 0, marginLeft: '1rem' }}>
+                    <div style={{ flexShrink: 0, marginLeft: '1rem', zIndex: 1 }}>
                         <img src="/guarda-la-fecha-2.png" alt="Guarda la fecha" style={{ width: '180px', height: 'auto', position: 'absolute', right: '0', top: '0' }} />
                     </div>
                 </div>
@@ -191,24 +201,37 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                 EXCLUSIVA + INTRO PARAGRAPH
                 ───────────────────────────────────────── */}
                 <Reveal>
+                    <style>{`
+                        .exclusiva-container {
+                            display: flex;
+                            gap: 0;
+                            align-items: stretch;
+                            text-align: justify;
+                            margin-bottom: 1.25rem;
+                        }
+                        .exclusiva-label {
+                            background: var(--ink);
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            padding: 0rem 0.6rem;
+                            flex-shrink: 0;
+                            width: 170px;
+                        }
+                        @media (max-width: 768px) {
+                            .exclusiva-container {
+                                flex-direction: column;
+                            }
+                            .exclusiva-label {
+                                width: 100%;
+                                padding: 0.4rem 0.6rem;
+                            }
+                        }
+                    `}</style>
                     {/* EXCLUSIVA: horizonal — wide black block | paragraph */}
-                    <div style={{
-                        display: 'flex',
-                        gap: 0,
-                        alignItems: 'stretch',
-                        textAlign: 'justify',
-                        marginBottom: '1.25rem',
-                    }}>
+                    <div className="exclusiva-container">
                         {/* Left: wide black label block */}
-                        <div style={{
-                            background: 'var(--ink)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            padding: '0rem 0.6rem',
-                            flexShrink: 0,
-                            width: '170px',
-                        }}>
+                        <div className="exclusiva-label">
                             <span className="sans" style={{
                                 color: 'var(--parchment)',
                                 fontSize: '0.58rem',
@@ -312,40 +335,53 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                         align-items: stretch;
                         margin-bottom: 1.5rem;
                     }
+                    .bd-img-container {
+                        flex: 0 0 34%;
+                    }
                     .bd-text-container {
                         display: flex;
                         flex: 1;
                         gap: 1.25rem;
                     }
+                    .bd-img-styled {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                        display: block;
+                        border-radius: 2px;
+                        border: 1px solid rgba(26,18,8,0.2);
+                    }
                     @media (max-width: 768px) {
+                        .brenda-david-grid {
+                            display: block;
+                        }
+                        .bd-img-container {
+                            float: left;
+                            width: 50%;
+                            margin-right: 1.25rem;
+                            margin-bottom: 0.5rem;
+                        }
                         .bd-text-container {
-                            flex-direction: column;
+                            display: block;
                         }
                     }
                 `}</style>
                 <Reveal>
                     <div className="brenda-david-grid">
-                        {/* Photo col — fills height */}
-                        <div style={{ flex: '0 0 50%' }}>
+                        {/* Photo col — floats on mobile */}
+                        <div className="bd-img-container">
                             <img
                                 src="/foto-1.jpeg"
                                 alt="Celebración"
-                                style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    objectFit: 'cover',
-                                    display: 'block',
-                                    borderRadius: '2px',
-                                    border: '1px solid rgba(26,18,8,0.2)',
-                                }}
+                                className="bd-img-styled"
                             />
                         </div>
                         {/* Text columns wrapping container */}
                         <div className="bd-text-container">
-                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
-                                <p>{t('bodaNoTradicional')}</p>
-                                <p>{t('outfit1')}</p>
-                                <p>{t('outfit2')}</p>
+                            <div style={{}}>
+                                <p style={{ marginBottom: '0.7rem' }}>{t('bodaNoTradicional')}</p>
+                                <p style={{ marginBottom: '0.7rem' }}>{t('outfit1')}</p>
+                                <p style={{ marginBottom: '0.7rem' }}>{t('outfit2')}</p>
                                 <p>{t('outfit3')}</p>
                             </div>
                         </div>
@@ -360,32 +396,12 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                     <hr className="rule-thick" style={{ margin: '0.3rem 0 1.5rem' }} />
                 </Reveal>
 
-                {/*── 2-column: info left | photo right ──*/}
+                {/*── ROW 1: Fecha, Hora, Dresscode | Photo ──*/}
                 <Reveal>
                     <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'stretch', marginBottom: '1.5rem' }}>
                         {/* Left: all event info */}
                         <div style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '1rem', paddingRight: '0.5rem' }}>
-                            {/* Dónde */}
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <div>
-                                    <p className="serif" style={{ fontStyle: 'italic', fontSize: '1.15rem', fontWeight: 600, textAlign: 'left', marginBottom: '0.25rem' }}>
-                                        {t('donde')}
-                                    </p>
-                                    <p className="serif" style={{ fontStyle: 'italic', fontSize: '0.9rem', textAlign: 'left' }}>
-                                        Samariwasi AirPort hotel<br />
-                                        Yaruquí, calle Juan<br />
-                                        Montalvo y Antonio Sucre
-                                    </p>
-                                </div>
-                                {/* QR (moved below Dónde) */}
-                                <div style={{ border: '1px solid var(--ink)', padding: '5px', background: '#fff', width: '80px', flexShrink: 0 }}>
-                                    <div style={{
-                                        width: '100%', aspectRatio: '1',
-                                        background: 'repeating-conic-gradient(#000 0% 25%, #fff 0% 50%) 0 0 / 10px 10px',
-                                    }} />
-                                </div>
-                            </div>
-                            {/* Cuándo */}
+                            {/* Cuándo / Fecha */}
                             <div>
                                 <p className="serif" style={{ fontStyle: 'italic', fontSize: '1.15rem', fontWeight: 600, textAlign: 'left', marginBottom: '0.15rem' }}>
                                     {t('cuando')}
@@ -404,71 +420,132 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                                 </p>
                             </div>
                             {/* Dress code */}
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', alignItems: 'flex-start' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', alignItems: 'flex-start' }}>
+                                {/* Casual */}
                                 <div>
-                                    <p className="serif" style={{ fontStyle: 'italic', fontSize: '1.05rem', fontWeight: 600, textAlign: 'left', marginBottom: '0.1rem' }}>
-                                        {t('dresscode')} <strong className="sans" style={{ fontStyle: 'normal', letterSpacing: '1px' }}>formal</strong>
+                                    <p className="sans" style={{ fontSize: '0.85rem', fontWeight: 600, textAlign: 'left', marginBottom: '0.1rem', textTransform: 'uppercase' }}>
+                                        {t('dresscodeCasual')}
                                     </p>
-                                    <p style={{ textAlign: 'left', color: 'var(--ink-mid)', fontSize: '0.78rem' }}>
-                                        {t('noBlanco')}
+                                    <p style={{ textAlign: 'left', color: 'var(--ink-mid)', fontSize: '0.8rem', fontStyle: 'italic' }}>
+                                        {t('ternoBano')}
                                     </p>
                                 </div>
-                                {/* 12 Dress Code Circles */}
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', maxWidth: '200px' }}>
-                                    {[
-                                        ['#EE7EA0', '#FFA9BA', '#E2C9DC', '#E7CDF6'],
-                                        ['#F6EFFF', '#CDBDEB', '#9A81B0', '#FFE6F5'],
-                                        ['#EA7D70', '#F69F95', '#FBA1A0', '#FCE2E3'],
-                                        ['#FFD7D6', '#FEC6BA', '#F8DCC4', '#E1CFCA'],
-                                        ['#FFAF6E', '#FFC699', '#FECB7F', '#FFCC80'],
-                                        ['#FFE2A6', '#FBFBBC', '#FBF8CB', '#FBF4D8'],
-                                        ['#BCC07B', '#D6D7AB', '#DBE098', '#CADBBB'],
-                                        ['#BCEACF', '#D5E2D3', '#E2EDE9'],
-                                        ['#BBE6F0', '#C5DEF2', '#ABCDDE', '#D5EDF8'],
-                                        ['#7D8BE0', '#B5BEF5', '#E4EBF1'],
-                                        ['#8E715B', '#C9A98D', '#B19F9A', '#4F3F3E'],
-                                        ['#E5DACA', '#F1ECEA', '#DBD1D9']
-                                    ].map((colors, idx) => {
-                                        let gradient = '';
-                                        if (colors.length === 4) {
-                                            gradient = `conic-gradient(${colors[0]} 0deg 90deg, ${colors[1]} 90deg 180deg, ${colors[2]} 180deg 270deg, ${colors[3]} 270deg 360deg)`;
-                                        } else if (colors.length === 3) {
-                                            gradient = `conic-gradient(${colors[0]} 0deg 120deg, ${colors[1]} 120deg 240deg, ${colors[2]} 240deg 360deg)`;
-                                        } else {
-                                            gradient = `conic-gradient(${colors[0]} 0deg 180deg, ${colors[1]} 180deg 360deg)`;
-                                        }
-                                        return (
-                                            <div
-                                                key={idx}
-                                                style={{
-                                                    width: '24px',
-                                                    height: '24px',
-                                                    borderRadius: '50%',
-                                                    flexShrink: 0,
-                                                    background: gradient,
-                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.12)'
-                                                }}
-                                            />
-                                        );
-                                    })}
-                                </div>
+
                             </div>
                         </div>
-                        {/* Right: photo fills full height */}
-                        <div style={{ flex: '1', display: 'flex', flexDirection: 'column' }}>
+                        {/* Right: Square Photo aligned left center */}
+                        <div style={{ flex: '1', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
                             <img
                                 src="/FOTO-LUGAR.jpg"
                                 alt="Lugar"
                                 style={{
                                     width: '100%',
-                                    flex: 1, /* Occupy all available height of column */
+                                    aspectRatio: '1/1',
                                     objectFit: 'cover',
+                                    objectPosition: 'center',
                                     display: 'block',
                                     borderRadius: '2px',
-                                    border: '1px solid rgba(26,18,8,0.2)',
-                                    minHeight: '200px'
+                                    border: '1px solid rgba(26,18,8,0.2)'
                                 }}
                             />
+                        </div>
+                    </div>
+                </Reveal>
+                {/* Formal */}
+                <div style={{ display: 'flex', flexDirection: 'row', gap: '0.75rem', alignItems: 'flex-start' }}>
+                    <div>
+                        <p className="sans" style={{ fontSize: '0.85rem', fontWeight: 600, textAlign: 'left', marginBottom: '0.1rem', textTransform: 'uppercase' }}>
+                            {t('dresscodeFormal')}
+                        </p>
+                        <p style={{ textAlign: 'left', color: 'var(--ink-mid)', fontSize: '0.78rem' }}>
+                            {t('noBlanco')}
+                        </p>
+                    </div>
+                    {/* Dress Code Circles */}
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', maxWidth: '200px' }}>
+                        {[
+                            ['#EE7EA0', '#FFA9BA', '#E2C9DC', '#E7CDF6'],
+                            ['#F6EFFF', '#CDBDEB', '#9A81B0', '#FFE6F5'],
+                            ['#EA7D70', '#F69F95', '#FBA1A0', '#FCE2E3'],
+                            ['#FFD7D6', '#FEC6BA', '#F8DCC4', '#E1CFCA'],
+                            ['#FFAF6E', '#FFC699', '#FECB7F', '#FFCC80'],
+                            ['#FFE2A6', '#FBFBBC', '#FBF8CB', '#FBF4D8'],
+                            ['#BCC07B', '#D6D7AB', '#DBE098', '#CADBBB'],
+                            ['#BCEACF', '#D5E2D3', '#E2EDE9'],
+                            ['#BBE6F0', '#C5DEF2', '#ABCDDE', '#D5EDF8'],
+                            ['#7D8BE0', '#B5BEF5', '#E4EBF1'],
+                            ['#8E715B', '#C9A98D', '#B19F9A', '#4F3F3E']
+                        ].map((colors, idx) => {
+                            let gradient = '';
+                            if (colors.length === 4) {
+                                gradient = `conic-gradient(${colors[0]} 0deg 90deg, ${colors[1]} 90deg 180deg, ${colors[2]} 180deg 270deg, ${colors[3]} 270deg 360deg)`;
+                            } else if (colors.length === 3) {
+                                gradient = `conic-gradient(${colors[0]} 0deg 120deg, ${colors[1]} 120deg 240deg, ${colors[2]} 240deg 360deg)`;
+                            } else {
+                                gradient = `conic-gradient(${colors[0]} 0deg 180deg, ${colors[1]} 180deg 360deg)`;
+                            }
+                            return (
+                                <div
+                                    key={idx}
+                                    style={{
+                                        width: '24px',
+                                        height: '24px',
+                                        borderRadius: '50%',
+                                        flexShrink: 0,
+                                        background: gradient,
+                                        boxShadow: '0 2px 4px rgba(0,0,0,0.12)'
+                                    }}
+                                />
+                            );
+                        })}
+                    </div>
+                </div>
+                {/*── ROW 2: Dónde + Map ──*/}
+                <Reveal>
+                    <div style={{ marginBottom: '2.5rem' }}>
+                        <div style={{ marginBottom: '1rem' }}>
+                            <p className="serif" style={{ fontStyle: 'italic', fontSize: '1.25rem', fontWeight: 600, textAlign: 'left', marginBottom: '0.25rem' }}>
+                                {t('donde')}
+                            </p>
+                            <p className="serif" style={{ fontStyle: 'italic', fontSize: '0.9rem', textAlign: 'left' }}>
+                                Samariwasi AirPort hotel<br />
+                                Yaruquí, calle Juan<br />
+                                Montalvo y Antonio Sucre
+                            </p>
+                        </div>
+                        {/* Map iframe */}
+                        <div style={{ width: '100%', marginTop: '0.5rem' }}>
+                            <iframe
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d99489.15105371822!2d-78.38362855873731!3d-0.17971741910849887!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91d592966df2cca9%3A0xed36f699181ad823!2sSamariwasi%20airport%20hotel!5e0!3m2!1ses!2sec!4v1773005626135!5m2!1ses!2sec"
+                                width="100%"
+                                height="250"
+                                style={{ border: 0, borderRadius: '4px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
+                                allowFullScreen={true}
+                                loading="lazy"
+                                referrerPolicy="no-referrer-when-downgrade"
+                            />
+                        </div>
+                    </div>
+                </Reveal>
+
+                <hr className="rule-double" />
+
+                <Reveal>
+                    <div style={{ marginBottom: '3rem' }}>
+                        <div style={{
+                            border: '1px solid rgba(26,18,8,0.15)',
+                            padding: '1.5rem 1rem',
+                            borderRadius: '6px',
+                            background: '#fff',
+                            boxShadow: '0 4px 15px rgba(0,0,0,0.06)',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center'
+                        }}>
+                            <img src="/seccion-pago.jpeg" alt="Pase" style={{ width: '100%', height: 'auto', display: 'block', marginBottom: '1.25rem', borderRadius: '4px' }} />
+                            <h3 className="serif" style={{ fontSize: '1.3rem', fontStyle: 'italic', marginBottom: '0.5rem', fontWeight: 600 }}>{t('pase1Persona')}</h3>
+                            <hr style={{ width: '40px', border: 'none', borderTop: '1px solid var(--ink)', margin: '0.5rem 0 1rem' }} />
+                            <p style={{ textAlign: 'center', fontSize: '0.85rem', lineHeight: 1.6 }}>{t('paseTexto')}</p>
                         </div>
                     </div>
                 </Reveal>
@@ -479,15 +556,18 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                 TRANSPORTE
                 ───────────────────────────────────────── */}
                 <Reveal>
-                    <p className="section-label">{t('traslados')}</p>
-                    <div style={{ padding: '1rem 0' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '1rem' }}>
+                        <p className="section-label" style={{ marginBottom: '0.3rem' }}>{t('traslados')}</p>
+                        <Bus size={32} strokeWidth={1.2} style={{ color: 'var(--ink)' }} />
+                    </div>
+                    <div style={{ padding: '0 0 1rem' }}>
                         <p style={{ marginBottom: '1.25rem' }} dangerouslySetInnerHTML={{ __html: t('trasladosTexto') }} />
 
                         {/* Transport checkbox */}
                         {!transportSaved ? (
                             <button
                                 className="btn-ink"
-                                onClick={() => { setNeedsTransport(true); setTransportSaved(true); }}
+                                onClick={handleTransportClick}
                                 style={{ width: '100%', padding: '0.8rem 1.5rem', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '1px' }}
                             >
                                 {t('siTransporte')}
@@ -570,10 +650,18 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                 ───────────────────────────────────────── */}
                 <Reveal>
                     <div style={{ marginBottom: '2.5rem', textAlign: 'center' }}>
-                        <p className="section-label" style={{ marginBottom: '0.5rem' }}>{t('regalos')}</p>
+                        <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+                            <img src="/regalos.png" alt="Regalos" style={{ width: '80%', height: 'auto', display: 'block' }} />
+                            <div className="birthstone" style={{ width: '100%', position: 'absolute', top: '20%', right: '0%', transform: 'translate(15%, -50%)', fontSize: '4rem', color: '#000000', whiteSpace: 'nowrap', lineHeight: 1, fontWeight: 500 }}>
+                                Regalo
+                            </div>
+                            <div className="birthstone" style={{ width: '100%', position: 'absolute', top: '32%', right: '0%', transform: 'translate(25%, -50%)', fontSize: '4rem', color: '#000000', whiteSpace: 'nowrap', lineHeight: 1, fontWeight: 500 }}>
+                                de bodas
+                            </div>
+                        </div>
 
                         <p style={{
-                            textAlign: 'center',
+                            textAlign: 'justify',
                             maxWidth: '440px',
                             margin: '1rem auto 1.5rem',
                             fontStyle: 'italic',
@@ -631,8 +719,9 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                     </div>
                 </Reveal>
 
-                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '3.5rem', opacity: 0.55 }}>
-                    <img src="/adorno-esquina.png" alt="" style={{ width: '400px', height: 'auto', transform: 'rotate(180deg)' }} />
+                {/* Bottom Right Corner Flourish (Mirrors Top Left) */}
+                <div style={{ position: 'absolute', right: '-25px', bottom: '-10px', opacity: 0.55, zIndex: 0 }}>
+                    <img src="/adorno-esquina-2.png" alt="" style={{ width: '40vw', maxWidth: '320px', height: 'auto', transform: 'rotate(180deg)' }} />
                 </div>
             </div>
 
