@@ -57,6 +57,18 @@
     "minutos": "min",
     "segundos": "sec",
     "quito": "24 · 04 · 2026 · Quito, Ecuador",
+    "confirmaAsistencia": "Confirm your attendance",
+    "siAsistire": "Yes, I will attend",
+    "noPodre": "No, I can't attend",
+    "rsvpError": "Please select an option.",
+    "errorGuardar": "There was an error saving your RSVP.",
+    "respuestaGuardada": "RSVP saved",
+    "graciasConfirmar": "Thank you for confirming! We wait for you.",
+    "lamentamosNoAcompane": "We are sorry you can't join us.",
+    "comentarioOpcional": "Any comment you wish to add (optional)",
+    "enviarConfirmacion": "Send RSVP",
+    "ejemploBailar": "E.g. Danza Kuduro - Don Omar",
+    "ejemploCena": "E.g. Perfect - Ed Sheeran",
     "langEN": "EN",
     "langES": "ES"
 }

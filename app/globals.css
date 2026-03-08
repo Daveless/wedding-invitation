@@ -41,8 +41,8 @@ body {
   min-height: 100dvh;
   position: relative;
   /* Parchment vintage and worn texture */
-  background-image: url('/mi-pergamino.jpg');
-  background-size: cover;
+  background-image: url('/background-4.jpeg');
+  background-size: contain;
   background-position: center;
 
   background-blend-mode: multiply;

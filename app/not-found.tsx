@@ -47,6 +47,7 @@ export default function NotFound() {
                             fontSize: 'clamp(2.5rem, 8vw, 3.5rem)',
                             lineHeight: 0.9,
                             marginBottom: '1rem',
+                            marginTop: '10rem',
                         }}>
                             Edición<br />Extraviada
                         </h1>

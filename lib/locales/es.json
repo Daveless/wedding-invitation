@@ -57,6 +57,18 @@
     "minutos": "min",
     "segundos": "seg",
     "quito": "24 · 04 · 2026 · Quito, Ecuador",
+    "confirmaAsistencia": "Confirma tu asistencia",
+    "siAsistire": "Sí asistiré",
+    "noPodre": "No podré asistir",
+    "rsvpError": "Por favor selecciona una opción.",
+    "errorGuardar": "Hubo un error al guardar tu confirmación.",
+    "respuestaGuardada": "Respuesta guardada",
+    "graciasConfirmar": "¡Gracias por confirmar! Te esperamos.",
+    "lamentamosNoAcompane": "Lamentamos que no puedas acompañarnos.",
+    "comentarioOpcional": "Algún comentario que quieras añadir (opcional)",
+    "enviarConfirmacion": "Enviar confirmación",
+    "ejemploBailar": "Ej. Danza Kuduro - Don Omar",
+    "ejemploCena": "Ej. Perfect - Ed Sheeran",
     "langEN": "EN",
     "langES": "ES"
 }

@@ -43,7 +43,7 @@ export default function HPLetter({ guestName, guestId, hasRsvp, rsvpAttending }:
 
                 {/* Hero typography */}
                 <Reveal>
-                    <div style={{ marginTop: '5rem', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <div style={{ marginTop: '50rem', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                         <h1 className="font-gothic" style={{ fontSize: 'clamp(3.5rem, 12vw, 5rem)', lineHeight: 0.85, textTransform: 'lowercase', letterSpacing: '0.05em' }}>
                             Nos vemos
                         </h1>
