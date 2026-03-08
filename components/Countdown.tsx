@@ -1,32 +1,30 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
-const TARGET_DATE = new Date('2025-04-24T14:00:00-05:00')
+const TARGET_DATE = new Date('2026-04-24T14:00:00-05:00')
 
 function TimeBox({ value, label }: { value: number; label: string }) {
     const display = String(value).padStart(2, '0')
     return (
-        <div style={{ textAlign: 'center' }}>
+        <div style={{ textAlign: 'center', flex: 1 }}>
             <div
                 style={{
-                    width: 'clamp(64px, 18vw, 80px)',
-                    height: 'clamp(64px, 18vw, 80px)',
-                    border: '1.5px solid var(--border)',
-                    borderRadius: '10px',
+                    width: '100%',
+                    padding: '0.8rem 0',
+                    border: '1px solid var(--ink)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    background: '#fffdf8',
-                    boxShadow: '0 2px 8px rgba(184,147,90,0.1)',
+                    background: 'rgba(255,255,255,0.4)',
                 }}
             >
                 <span
+                    className="masthead"
                     style={{
-                        fontFamily: 'var(--font-cormorant)',
-                        fontSize: 'clamp(1.6rem, 5vw, 2.2rem)',
-                        fontWeight: 600,
-                        color: 'var(--gold)',
+                        fontSize: 'clamp(2rem, 6vw, 2.8rem)',
+                        color: 'var(--ink)',
                         lineHeight: 1,
                     }}
                 >
@@ -34,13 +32,14 @@ function TimeBox({ value, label }: { value: number; label: string }) {
                 </span>
             </div>
             <p
+                className="sans"
                 style={{
-                    fontFamily: 'var(--font-lato)',
                     fontSize: '0.65rem',
-                    letterSpacing: '0.18em',
+                    letterSpacing: '0.15em',
                     textTransform: 'uppercase',
-                    color: 'var(--text-light)',
-                    marginTop: '0.5rem',
+                    color: 'var(--ink-mid)',
+                    marginTop: '0.4rem',
+                    fontWeight: 600,
                 }}
             >
                 {label}
@@ -50,6 +49,7 @@ function TimeBox({ value, label }: { value: number; label: string }) {
 }
 
 export default function Countdown() {
+    const { t } = useTranslation()
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 })
     const [mounted, setMounted] = useState(false)
     const [expired, setExpired] = useState(false)
@@ -78,40 +78,25 @@ export default function Countdown() {
     if (!mounted) return null
 
     return (
-        <section className="section" id="countdown" style={{ textAlign: 'center', background: '#fafaf8' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>⏳</div>
-
-            <h2 style={{
-                fontFamily: 'var(--font-cormorant)',
-                fontSize: '2rem',
-                fontWeight: 600,
-                color: 'var(--text-dark)',
-                marginBottom: '0.4rem',
-            }}>
-                {expired ? '¡El gran día llegó!' : 'La cuenta regresiva'}
-            </h2>
-            <p style={{
-                fontFamily: 'var(--font-cormorant)',
-                fontStyle: 'italic',
-                color: 'var(--text-mid)',
-                fontSize: '1.05rem',
-                marginBottom: '2.5rem',
-            }}>
-                Viernes 24 de Abril de 2025, 2:00 PM
+        <div style={{ margin: '2rem 0', padding: '1.5rem', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.2)' }}>
+            <p className="section-label" style={{ textAlign: 'center', marginBottom: '1rem' }}>
+                {expired ? t('elGranDia') : t('faltan')}
             </p>
 
             {!expired && (
                 <div style={{
                     display: 'flex',
                     justifyContent: 'center',
-                    gap: 'clamp(0.6rem, 3vw, 1.25rem)',
+                    gap: '0.8rem',
+                    maxWidth: '400px',
+                    margin: '0 auto',
                 }}>
-                    <TimeBox value={timeLeft.days} label="días" />
-                    <TimeBox value={timeLeft.hours} label="horas" />
-                    <TimeBox value={timeLeft.minutes} label="min" />
-                    <TimeBox value={timeLeft.seconds} label="seg" />
+                    <TimeBox value={timeLeft.days} label={t('dias')} />
+                    <TimeBox value={timeLeft.hours} label={t('horas')} />
+                    <TimeBox value={timeLeft.minutes} label={t('minutos')} />
+                    <TimeBox value={timeLeft.seconds} label={t('segundos')} />
                 </div>
             )}
-        </section>
+        </div>
     )
 }

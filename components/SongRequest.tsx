@@ -3,19 +3,22 @@
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
+import { useTranslation } from 'react-i18next'
+
 interface SongRequestProps {
     guestId: string
     type?: 'dance' | 'dinner'
 }
 
 export default function SongRequest({ guestId, type = 'dance' }: SongRequestProps) {
+    const { t } = useTranslation()
     const [song, setSong] = useState('')
     const [loading, setLoading] = useState(false)
     const [songs, setSongs] = useState<string[]>([])
 
     const placeholder = type === 'dance'
-        ? 'Ej: Bohemian Rhapsody - Queen'
-        : 'Ej: La Vie En Rose - Édith Piaf'
+        ? t('ejemploBailar')
+        : t('ejemploCena')
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -50,7 +53,7 @@ export default function SongRequest({ guestId, type = 'dance' }: SongRequestProp
                     disabled={loading || !song.trim()}
                     style={{ width: 'auto', padding: '0 1.5rem' }}
                 >
-                    {loading ? '...' : 'Agregar'}
+                    {loading ? '...' : t('agregar')}
                 </button>
             </form>
 

@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import RSVPForm from './RSVPForm'
 import SongRequest from './SongRequest'
+import Countdown from './Countdown'
+import { useTranslation } from 'react-i18next'
 
 interface Props {
     guestName: string
@@ -27,11 +29,16 @@ function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
 }
 
 export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAttending }: Props) {
+    const { t, i18n } = useTranslation()
     const [showGifts, setShowGifts] = useState(false)
     const [showPaypal, setShowPaypal] = useState(false)
     const [showBank, setShowBank] = useState(false)
     const [needsTransport, setNeedsTransport] = useState(false)
     const [transportSaved, setTransportSaved] = useState(false)
+
+    const toggleLanguage = () => {
+        i18n.changeLanguage(i18n.language === 'es' ? 'en' : 'es')
+    }
 
     return (
         <motion.div
@@ -85,8 +92,43 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                     }}>
                         David y Brenda
                     </p>
+                    <p style={{
+                        fontFamily: "'Libre Caslon Display', serif",
+                        fontSize: 'clamp(1.1rem, 3.5vw, 1.6rem)',
+                        color: '#fff',
+                        letterSpacing: '0.4em',
+                        marginTop: '0.5rem',
+                        fontWeight: 600,
+                        marginLeft: '1.5rem'
+                    }}>
+                        {t('teInvitan')}
+                    </p>
                 </div>
             </div>
+
+            {/* Language Toggle Button */}
+            <button
+                onClick={toggleLanguage}
+                style={{
+                    position: 'absolute',
+                    top: '1rem',
+                    right: '1rem',
+                    background: 'rgba(255,255,255,0.2)',
+                    backdropFilter: 'blur(4px)',
+                    border: '1px solid rgba(255,255,255,0.4)',
+                    color: '#fff',
+                    padding: '0.4rem 0.8rem',
+                    borderRadius: '20px',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    letterSpacing: '2px',
+                    cursor: 'pointer',
+                    zIndex: 50,
+                    transition: 'background 0.3s'
+                }}
+            >
+                {t(i18n.language === 'es' ? 'langEN' : 'langES')}
+            </button>
 
             {/* Inner content padding */}
             <div style={{ padding: '3rem 2.25rem 4rem', position: 'relative' }}>
@@ -97,18 +139,12 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
                     {/* Left corner flourish */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', opacity: 0.55, lineHeight: 1 }}>
-                        <span style={{ fontSize: '1.5rem', fontFamily: 'Georgia' }}>❦</span>
-                        <div style={{ display: 'flex', gap: '6px' }}>
-                            <div style={{ height: '1px', width: '28px', background: 'var(--ink)', marginTop: '8px', opacity: 0.4 }} />
-                            <div style={{ height: '1px', width: '14px', background: 'var(--ink)', marginTop: '8px', opacity: 0.25 }} />
-                        </div>
+                        <img src="/adorno-esquina.png" alt="" style={{ width: '400px', height: 'auto', position: 'absolute' }} />
                     </div>
 
                     {/* Right: "Guarda la fecha" box */}
-                    <div style={{ border: '1px solid var(--ink)', padding: '0.4rem 0.8rem', flexShrink: 0, marginLeft: '1rem' }}>
-                        <span className="birthstone" style={{ fontSize: '1.8rem', lineHeight: 1 }}>
-                            Guarda la fecha
-                        </span>
+                    <div style={{ flexShrink: 0, marginLeft: '1rem' }}>
+                        <img src="/guarda-la-fecha.png" alt="Guarda la fecha" style={{ width: '140px', height: 'auto' }} />
                     </div>
                 </div>
 
@@ -116,14 +152,21 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                 GOTHIC HERO TITLE  "Nos vemos el 24 de Abril"
                 ───────────────────────────────────────── */}
                 <Reveal>
-                    <div style={{ marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '0.1rem' }}>
-                        <h1 className="masthead" style={{ fontSize: 'clamp(3.5rem, 13vw, 8rem)', lineHeight: 0.9, color: 'var(--ink)', width: '100%' }}>
-                            Nos vemos
-                        </h1>
-                        <h1 className="masthead" style={{ fontSize: 'clamp(3.5rem, 13vw, 7rem)', lineHeight: 0.9, color: 'var(--ink)', width: '100%' }}>
-                            el 24 de Abril
-                        </h1>
+                    <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', position: 'relative' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '0.5rem', flex: 1 }}>
+                            <h1 className="masthead" style={{ fontSize: 'clamp(3.5rem, 13vw, 8rem)', lineHeight: 0.9, color: 'var(--ink)', width: '100%' }}>
+                                {t('nosVemos')}
+                            </h1>
+                            <h1 className="masthead" style={{ fontSize: 'clamp(3.5rem, 13vw, 7rem)', lineHeight: 0.9, color: 'var(--ink)', width: '100%' }}>
+                                {t('el24deAbril')}
+                            </h1>
+                        </div>
+                        <img src="/adorno-planta.png" alt="" style={{ width: '45px', height: 'auto', position: 'absolute', right: '0', bottom: '0', transform: 'translateX(30%)' }} />
                     </div>
+                </Reveal>
+
+                <Reveal>
+                    <Countdown />
                 </Reveal>
 
                 <hr className="rule" />
@@ -132,23 +175,23 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                 EXCLUSIVA + INTRO PARAGRAPH
                 ───────────────────────────────────────── */}
                 <Reveal>
-                    {/* Two-column: stamp col (black bg) | text col */}
+                    {/* EXCLUSIVA: horizonal — wide black block | paragraph */}
                     <div style={{
                         display: 'flex',
                         gap: 0,
                         alignItems: 'stretch',
+                        textAlign: 'justify',
                         marginBottom: '1.25rem',
-                        border: '1px solid var(--border)',
                     }}>
-                        {/* Left: stamp block full height */}
+                        {/* Left: wide black label block */}
                         <div style={{
                             background: 'var(--ink)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            padding: '1rem 0.6rem',
+                            padding: '0rem 0.6rem',
                             flexShrink: 0,
-                            width: '40px',
+                            width: '170px',
                         }}>
                             <span className="sans" style={{
                                 color: 'var(--parchment)',
@@ -156,30 +199,34 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                                 fontWeight: 700,
                                 letterSpacing: '3px',
                                 textTransform: 'uppercase',
-                                writingMode: 'vertical-rl',
-                                transform: 'rotate(180deg)',
                                 whiteSpace: 'nowrap',
-                            }}>Exclusiva</span>
+                            }}>{t('exclusiva')}</span>
                         </div>
                         {/* Right: paragraph */}
                         <p style={{
                             flex: 1,
-                            padding: '0.9rem 1rem',
+                            padding: '0rem 1rem',
                             textAlign: 'justify',
                             fontSize: '0.86rem',
                             lineHeight: 1.65,
                         }}>
-                            Hay momentos en la vida que son especiales, pero compartirlos con quienes amamos los hace
-                            inolvidables. Por eso queremos que seas parte de esta pequeña y muy íntima celebración del
-                            amor que nos tenemos.
+                            {t('exclusivaTexto')}
                         </p>
+                    </div>
+                </Reveal>
+
+                {/* Full-width square photo after Exclusiva */}
+                <Reveal>
+                    <div style={{ width: '100%', marginBottom: '1.5rem', overflow: 'hidden', background: 'rgba(26,18,8,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(26,18,8,0.18)' }}>
+                        <img src="/portada.jpg" alt="Portada exclusvia" style={{ width: '100%', height: 'auto', display: 'block' }} />
                     </div>
                 </Reveal>
 
                 <hr className="rule" />
 
                 {/*─────────────────────────────────────────
-                TE INVITAMOS + GUEST NAME
+                TE INVITAMOS — newspaper column-wrap layout
+                Text fills left ~75%, image in right, text continues
                 ───────────────────────────────────────── */}
                 <Reveal>
                     <h2 className="sans" style={{
@@ -188,59 +235,46 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                         letterSpacing: '5px',
                         textTransform: 'uppercase',
                         fontWeight: 600,
-                        marginBottom: '2rem',
+                        marginBottom: '1.25rem',
                     }}>
-                        Te invitamos a nuestra boda
+                        {t('teInvitamos')}
                     </h2>
-                </Reveal>
-
-                {/*─────────────────────────────────────────
-                2-COLUMN: story left | photo right
-                ───────────────────────────────────────── */}
-                <Reveal>
-                    <div className="news-grid" style={{ marginBottom: '1.25rem' }}>
-                        <div className="col-text" style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
-                            <p>
-                                Nuestra historia comenzó un 24 de abril de 2018, casi sin imaginar que ese día marcaría
-                                el inicio del viaje más hermoso de nuestras vidas.
-                            </p>
-                            <p>
-                                El 17 de septiembre de 2022, frente al mar y con el sonido de las olas como testigo, ya
-                                nos habíamos dicho &ldquo;sí&rdquo; a una vida juntos, prometiéndonos amor, paciencia, respeto y
-                                complicidad.
-                            </p>
-                            <p>
-                                Elegimos esta fecha tan significativa para dar el siguiente paso al celebrar nuestro
-                                octavo aniversario, con la certeza de haber encontrado el uno en el otro nuestro lugar
-                                seguro, nuestro refugio, nuestro hogar.
-                            </p>
-                        </div>
-                        <div className="col-photo">
-                            <img
-                                src="/CELEBRACION.jpg"
-                                alt="Nuestra historia"
+                    {/*
+                      Newspaper wrap: float the image to the right so text
+                      flows around it — starts full-width left, then right
+                      side gets occupied by the image, remaining text wraps
+                      beneath it on the right.
+                    */}
+                    <div style={{ marginBottom: '1.25rem', overflow: 'hidden' }}>
+                        {/* Floated right: gif/image block */}
+                        <div style={{
+                            float: 'right',
+                            width: '45%',
+                            marginLeft: '1.25rem',
+                            marginBottom: '0.5rem',
+                        }}>
+                            <video
+                                src="/gif-boda.mp4"
+                                autoPlay
+                                loop
+                                muted
+                                playsInline
                                 style={{
                                     width: '100%',
-                                    height: '100%',
+                                    aspectRatio: '1',
                                     objectFit: 'cover',
-                                    aspectRatio: '4/5',
-                                    borderRadius: '2px',
-                                    border: '1px solid rgba(26,18,8,0.2)',
+                                    border: '1px dashed rgba(26,18,8,0.3)',
+                                    display: 'block'
                                 }}
                             />
                         </div>
+                        {/* All text flows naturally around the float */}
+                        <p style={{ marginBottom: '0.7rem' }}>{t('historia1')}</p>
+                        <p style={{ marginBottom: '0.7rem' }}>{t('historia2')}</p>
+                        <p style={{ marginBottom: '0.7rem' }}>{t('historia3')}</p>
+                        <p style={{ marginBottom: '0.7rem' }}>{t('historia4')}</p>
+                        <p>{t('historia5')}</p>
                     </div>
-                </Reveal>
-
-                <Reveal>
-                    <p style={{ marginBottom: '0.75rem' }}>
-                        Queremos que solo quienes verdaderamente han sido parte esencial de nuestro camino, quienes
-                        han reído con nosotros, nos han sostenido y han sido testigos de nuestra historia individual
-                        y como pareja, nos acompañen en este momento tan especial.
-                    </p>
-                    <p>
-                        Tenerlos a nuestro lado hará aún más significativo este día extraordinario para nosotros.
-                    </p>
                 </Reveal>
 
                 <hr className="rule-double" />
@@ -261,7 +295,7 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                     </h1>
                 </Reveal>
 
-                {/*── 3-column: photo | text col 1 | text col 2 ──*/}
+                {/*── 3-COLUMN: photo | text col 1 | text col 2 ──*/}
                 <Reveal>
                     <div style={{
                         display: 'flex',
@@ -270,9 +304,9 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                         marginBottom: '1.5rem',
                     }}>
                         {/* Photo col — fills height */}
-                        <div style={{ flex: '0 0 38%', minHeight: '100%' }}>
+                        <div style={{ flex: '0 0 34%' }}>
                             <img
-                                src="/HISTORIA.jpg"
+                                src="/foto-1.jpeg"
                                 alt="Celebración"
                                 style={{
                                     width: '100%',
@@ -286,23 +320,13 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                         </div>
                         {/* Text col 1 */}
                         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
-                            <p>
-                                Nuestra boda no será una celebración tradicional, será una experiencia pensada para
-                                vivirla juntos, paso a paso. Nos veremos en Yaruquí, para comenzar la tarde en un
-                                ambiente cálido y relajado.
-                            </p>
-                            <p>
-                                El primer outfit será casual, ideal para compartir risas, karaoke, billar, bebidas y
-                                bocaditos mientras el sol nos acompaña.
-                            </p>
-                            <p>
-                                Si el clima lo permite y lo deseas, podrás cambiar a un segundo outfit: terno de baño,
-                                para disfrutar de la piscina y seguir celebrando bajo el cielo abierto.
-                            </p>
-                            <p>
-                                Y cuando llegue la noche, los invitamos a transformar la energía y vestir su mejor
-                                atuendo formal para ser testigos de nuestra ceremonia y la fiesta que sigue.
-                            </p>
+                            <p>{t('bodaNoTradicional')}</p>
+                            <p>{t('outfit1')}</p>
+                        </div>
+                        {/* Text col 2 */}
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
+                            <p>{t('outfit2')}</p>
+                            <p>{t('outfit3')}</p>
                         </div>
                     </div>
                 </Reveal>
@@ -311,7 +335,7 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                 INFORMACIÓN section
                 ───────────────────────────────────────── */}
                 <Reveal>
-                    <p className="section-label">Información</p>
+                    <p className="section-label">{t('informacion')}</p>
                     <hr className="rule-thick" style={{ margin: '0.3rem 0 1.5rem' }} />
                 </Reveal>
 
@@ -319,34 +343,43 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                 <Reveal>
                     <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'stretch', marginBottom: '1.5rem' }}>
                         {/* Left: all event info */}
-                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <div style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '1rem', paddingRight: '0.5rem' }}>
                             {/* Dónde */}
-                            <div>
-                                <p className="serif" style={{ fontStyle: 'italic', fontSize: '1.15rem', fontWeight: 600, textAlign: 'left', marginBottom: '0.25rem' }}>
-                                    ¿Dónde?
-                                </p>
-                                <p className="serif" style={{ fontStyle: 'italic', fontSize: '0.9rem', textAlign: 'left' }}>
-                                    Samariwasi AirPort hotel<br />
-                                    Yaruquí, calle Juan<br />
-                                    Montalvo y Antonio Sucre
-                                </p>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                <div>
+                                    <p className="serif" style={{ fontStyle: 'italic', fontSize: '1.15rem', fontWeight: 600, textAlign: 'left', marginBottom: '0.25rem' }}>
+                                        {t('donde')}
+                                    </p>
+                                    <p className="serif" style={{ fontStyle: 'italic', fontSize: '0.9rem', textAlign: 'left' }}>
+                                        Samariwasi AirPort hotel<br />
+                                        Yaruquí, calle Juan<br />
+                                        Montalvo y Antonio Sucre
+                                    </p>
+                                </div>
+                                {/* QR */}
+                                <div style={{ border: '1px solid var(--ink)', padding: '5px', background: '#fff', width: '80px', flexShrink: 0 }}>
+                                    <div style={{
+                                        width: '100%', aspectRatio: '1',
+                                        background: 'repeating-conic-gradient(#000 0% 25%, #fff 0% 50%) 0 0 / 10px 10px',
+                                    }} />
+                                </div>
                             </div>
                             {/* Cuándo */}
                             <div>
                                 <p className="serif" style={{ fontStyle: 'italic', fontSize: '1.15rem', fontWeight: 600, textAlign: 'left', marginBottom: '0.15rem' }}>
-                                    ¿Cuándo?
+                                    {t('cuando')}
                                 </p>
                                 <p className="sans" style={{ fontSize: '0.8rem', letterSpacing: '1.5px', textTransform: 'uppercase', textAlign: 'left' }}>
-                                    24 de Abril 2026
+                                    {t('el24deAbril')} 2026
                                 </p>
                             </div>
                             {/* Hora */}
                             <div>
                                 <p className="serif" style={{ fontStyle: 'italic', fontSize: '1.15rem', fontWeight: 600, textAlign: 'left', marginBottom: '0.15rem' }}>
-                                    Hora
+                                    {t('hora')}
                                 </p>
                                 <p className="serif" style={{ fontStyle: 'italic', fontSize: '1rem', textAlign: 'left' }}>
-                                    3 pm a 12 am
+                                    {t('3a12')}
                                 </p>
                             </div>
                             {/* Dress code */}
@@ -358,50 +391,40 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                                 }} />
                                 <div>
                                     <p className="serif" style={{ fontStyle: 'italic', fontSize: '1.05rem', fontWeight: 600, textAlign: 'left', marginBottom: '0.1rem' }}>
-                                        Dress code <strong className="sans" style={{ fontStyle: 'normal', letterSpacing: '1px' }}>formal</strong>
+                                        {t('dresscode')} <strong className="sans" style={{ fontStyle: 'normal', letterSpacing: '1px' }}>formal</strong>
                                     </p>
                                     <p style={{ textAlign: 'left', color: 'var(--ink-mid)', fontSize: '0.78rem' }}>
-                                        No blanco, marfil, hueso, perla ni rojo. No jeans.
+                                        {t('noBlanco')}
                                     </p>
                                 </div>
                             </div>
-                            {/* QR */}
-                            <div style={{ border: '1px solid var(--ink)', padding: '5px', background: '#fff', width: '80px' }}>
-                                <div style={{
-                                    width: '100%', aspectRatio: '1',
-                                    background: 'repeating-conic-gradient(#000 0% 25%, #fff 0% 50%) 0 0 / 10px 10px',
-                                }} />
-                            </div>
+
+                            <p className="birthstone" style={{
+                                fontSize: '1.8rem',
+                                color: 'var(--ink)',
+                                fontWeight: 300,
+                                textAlign: 'left',
+                                marginTop: '1rem',
+                            }}>
+                                {t('gracias')}
+                            </p>
                         </div>
                         {/* Right: photo fills full height */}
-                        <div style={{ flex: '0 0 40%' }}>
+                        <div style={{ flex: '1', display: 'flex', flexDirection: 'column' }}>
                             <img
                                 src="/FOTO-LUGAR.jpg"
                                 alt="Lugar"
                                 style={{
                                     width: '100%',
-                                    height: '100%',
+                                    flex: 1, /* Occupy all available height of column */
                                     objectFit: 'cover',
                                     display: 'block',
                                     borderRadius: '2px',
                                     border: '1px solid rgba(26,18,8,0.2)',
+                                    minHeight: '200px'
                                 }}
                             />
                         </div>
-                    </div>
-                </Reveal>
-
-                {/*── "Gracias por ser parte" ──*/}
-                <Reveal>
-                    <div style={{ textAlign: 'center', marginTop: '2rem', marginBottom: '1.5rem' }}>
-                        <p className="birthstone" style={{
-                            fontSize: 'clamp(3rem, 11vw, 5rem)',
-                            lineHeight: 1.05,
-                            color: 'var(--ink)',
-                            width: '100%',
-                        }}>
-                            Gracias por ser parte<br />de nuestra historia
-                        </p>
                     </div>
                 </Reveal>
 
@@ -411,53 +434,19 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                 TRANSPORTE
                 ───────────────────────────────────────── */}
                 <Reveal>
-                    <p className="section-label">Traslados</p>
+                    <p className="section-label">{t('traslados')}</p>
                     <div style={{ padding: '1rem 0' }}>
-                        <p style={{ marginBottom: '1.25rem' }}>
-                            Para su comodidad, contaremos con servicio de bus que saldrá desde <strong>Yaruquí</strong> con destino al sur de Quito a las <strong>12:00 AM (medianoche)</strong> del día del evento.
-                        </p>
+                        <p style={{ marginBottom: '1.25rem' }} dangerouslySetInnerHTML={{ __html: t('trasladosTexto') }} />
+
                         {/* Transport checkbox */}
                         {!transportSaved ? (
-                            <div style={{
-                                border: '1px solid var(--border)',
-                                padding: '1rem',
-                                background: 'rgba(255,255,255,0.35)',
-                                borderRadius: '2px',
-                            }}>
-                                <p style={{ marginBottom: '0.75rem', fontStyle: 'italic', fontSize: '0.88rem' }}>
-                                    ¿Necesitas transporte de regreso?
-                                </p>
-                                <label style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.75rem',
-                                    cursor: 'pointer',
-                                    padding: '0.6rem 0.8rem',
-                                    border: `1px solid ${needsTransport ? 'var(--ink)' : 'var(--border)'}`,
-                                    background: needsTransport ? 'var(--ink)' : 'rgba(255,255,255,0.4)',
-                                    color: needsTransport ? 'var(--parchment)' : 'var(--ink)',
-                                    borderRadius: '2px',
-                                    transition: 'all 0.2s',
-                                    marginBottom: '0.75rem',
-                                }}>
-                                    <input
-                                        type="checkbox"
-                                        checked={needsTransport}
-                                        onChange={e => setNeedsTransport(e.target.checked)}
-                                        style={{ width: '16px', height: '16px', accentColor: 'var(--ink)', cursor: 'pointer' }}
-                                    />
-                                    <span className="sans" style={{ fontSize: '0.8rem', fontWeight: 600, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
-                                        Sí, necesito transporte de regreso
-                                    </span>
-                                </label>
-                                <button
-                                    className="btn-ink"
-                                    onClick={() => setTransportSaved(true)}
-                                    style={{ width: 'auto', padding: '0.6rem 1.5rem', fontSize: '0.7rem' }}
-                                >
-                                    Guardar preferencia
-                                </button>
-                            </div>
+                            <button
+                                className="btn-ink"
+                                onClick={() => { setNeedsTransport(true); setTransportSaved(true); }}
+                                style={{ width: '100%', padding: '0.8rem 1.5rem', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '1px' }}
+                            >
+                                {t('siTransporte')}
+                            </button>
                         ) : (
                             <div style={{
                                 padding: '0.8rem 1rem',
@@ -466,10 +455,9 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                                 borderRadius: '2px',
                                 fontSize: '0.85rem',
                                 fontStyle: 'italic',
+                                textAlign: 'center'
                             }}>
-                                {needsTransport
-                                    ? '✓ Hemos registrado que necesitas transporte de regreso. ¡Gracias!'
-                                    : '✓ Preferencia guardada: no necesitas transporte.'}
+                                {t('transporteGuardadoSi')}
                             </div>
                         )}
                     </div>
@@ -499,9 +487,9 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                 ───────────────────────────────────────── */}
                 <Reveal>
                     <div style={{ marginBottom: '2.5rem' }}>
-                        <p className="section-label" style={{ marginBottom: '0.5rem' }}>Confirma tu asistencia</p>
+                        <p className="section-label" style={{ marginBottom: '0.5rem' }}>{t('confirmaAsistencia')}</p>
                         <h2 className="gothic" style={{ fontSize: 'clamp(2rem, 7vw, 2.8rem)', marginBottom: '1.25rem' }}>
-                            ¿Nos acompañas?
+                            {t('nosAcompanas')}
                         </h2>
                         <RSVPForm guestId={guestId} initialRsvp={hasRsvp ? rsvpAttending : null} />
                     </div>
@@ -514,12 +502,12 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                 ───────────────────────────────────────── */}
                 <Reveal>
                     <div style={{ marginBottom: '2rem' }}>
-                        <p className="section-label" style={{ marginBottom: '0.5rem' }}>Playlist Oficial</p>
+                        <p className="section-label" style={{ marginBottom: '0.5rem' }}>{t('playlistOficial')}</p>
                         <h2 className="gothic" style={{ fontSize: 'clamp(1.8rem, 6vw, 2.5rem)', marginBottom: '0.5rem' }}>
-                            ¿Qué canción no puede faltar para bailar?
+                            {t('cancionBailar')}
                         </h2>
                         <p style={{ marginBottom: '1.25rem', textAlign: 'left' }}>
-                            Comparte el tema que no puede faltar en la pista de baile esta noche. Lo añadiremos a la setlist de la fiesta.
+                            {t('cancionBailarSub')}
                         </p>
                         <SongRequest guestId={guestId} type="dance" />
                     </div>
@@ -532,12 +520,12 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                 ───────────────────────────────────────── */}
                 <Reveal>
                     <div style={{ marginBottom: '2.5rem' }}>
-                        <p className="section-label" style={{ marginBottom: '0.5rem' }}>Música para la cena</p>
+                        <p className="section-label" style={{ marginBottom: '0.5rem' }}>{t('musicaCena')}</p>
                         <h2 className="gothic" style={{ fontSize: 'clamp(1.8rem, 6vw, 2.5rem)', marginBottom: '0.5rem' }}>
-                            ¿Qué escucharías durante la cena?
+                            {t('cancionCena')}
                         </h2>
                         <p style={{ marginBottom: '1.25rem', textAlign: 'left' }}>
-                            Comparte una canción que te guste escuchar durante la cena. Crearemos el ambiente perfecto con tus sugerencias.
+                            {t('cancionCenaSub')}
                         </p>
                         <SongRequest guestId={guestId} type="dinner" />
                     </div>
@@ -550,7 +538,7 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                 ───────────────────────────────────────── */}
                 <Reveal>
                     <div style={{ marginBottom: '2.5rem', textAlign: 'center' }}>
-                        <p className="section-label" style={{ marginBottom: '0.5rem' }}>Regalos</p>
+                        <p className="section-label" style={{ marginBottom: '0.5rem' }}>{t('regalos')}</p>
                         <div style={{ fontSize: '2rem', marginBottom: '0.75rem' }}>💛</div>
                         <p style={{
                             textAlign: 'center',
@@ -559,10 +547,7 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                             fontStyle: 'italic',
                             fontSize: '0.9rem',
                             lineHeight: 1.7,
-                        }}>
-                            Su presencia es nuestro mejor regalo.<br />
-                            Si desean darnos algo más, pueden ayudarnos a construir nuestros próximos sueños y nuestra luna de miel.
-                        </p>
+                        }} dangerouslySetInnerHTML={{ __html: t('regaloTexto') }} />
                         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
                             <button
                                 className="btn-ink"
@@ -590,12 +575,15 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                 <Reveal>
                     <div style={{ textAlign: 'center', paddingTop: '1rem' }}>
                         <span className="birthstone" style={{ fontSize: 'clamp(3rem, 12vw, 5rem)', display: 'block' }}>Brenda &amp; David</span>
-                        <p className="sans" style={{ fontSize: '0.65rem', letterSpacing: '4px', textTransform: 'uppercase', color: 'var(--ink-light)', marginTop: '0.5rem' }}>
+                        <p className="sans" style={{ fontSize: '0.65rem', letterSpacing: '4px', textTransform: 'uppercase', color: 'var(--ink-light)', marginTop: '0.5rem', textAlign: 'center', marginRight: '-4px' }}>
                             24 · 04 · 2026 · Quito, Ecuador
                         </p>
                     </div>
                 </Reveal>
 
+                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '3.5rem', opacity: 0.55 }}>
+                    <img src="/adorno-esquina.png" alt="" style={{ width: '400px', height: 'auto', transform: 'rotate(180deg)' }} />
+                </div>
             </div>
 
             {/* ─── BANK MODAL ─── */}
@@ -603,10 +591,10 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                 <Modal onClose={() => setShowBank(false)} title="Transferencia — Produbanco">
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
                         {[
-                            { label: 'Banco', value: 'Produbanco' },
-                            { label: 'Titular', value: 'Brenda [Apellido] / David [Apellido]' },
-                            { label: 'Tipo de cuenta', value: 'Corriente / Ahorros' },
-                            { label: 'Número de cuenta', value: '0000000000' },
+                            { label: t('banco'), value: 'Produbanco' },
+                            { label: t('titular'), value: 'Brenda [Apellido] / David [Apellido]' },
+                            { label: t('tipoCuenta'), value: t('tipoCuentaValor') },
+                            { label: t('numeroCuenta'), value: '0000000000' },
                             { label: 'Cédula / RUC', value: '0000000000' },
                         ].map((row, i, arr) => (
                             <div key={row.label} style={{
@@ -621,7 +609,7 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                         ))}
                     </div>
                     <p style={{ textAlign: 'center', fontSize: '0.78rem', color: 'var(--ink-light)', marginTop: '1rem', fontStyle: 'italic' }}>
-                        Por favor incluye tu nombre en el concepto de la transferencia. ¡Gracias!
+                        {t('notaTransferencia')}
                     </p>
                 </Modal>
             )}
@@ -634,9 +622,7 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                         <p className="serif" style={{ fontSize: '1.1rem', fontWeight: 600, margin: '1rem 0 0.25rem', textAlign: 'center' }}>
                             paypal.me/[usuario]
                         </p>
-                        <p style={{ textAlign: 'center', fontSize: '0.82rem', color: 'var(--ink-mid)' }}>
-                            Puedes enviar tu regalo directamente a través de PayPal.<br />
-                            Por favor incluye tu nombre en el mensaje.
+                        <p style={{ textAlign: 'center', fontSize: '0.82rem', color: 'var(--ink-mid)' }} dangerouslySetInnerHTML={{ __html: t('notaPaypal') }}>
                         </p>
                         <a
                             href="https://paypal.me/[usuario]"

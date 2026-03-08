@@ -47,26 +47,25 @@ export default function LandingScreen({ onOpen }: LandingScreenProps) {
                         <SwallowSVG />
                     </div>
 
-                    {/* "Tienes una invitación" */}
+                    {/* "Guarda la fecha" (Cursive) */}
                     <motion.p
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.3, duration: 0.6 }}
+                        className="birthstone"
                         style={{
-                            fontFamily: 'var(--font-lora)',
-                            fontStyle: 'italic',
-                            color: 'var(--cream)',
+                            color: 'var(--gold)',
                             textAlign: 'center',
-                            fontSize: '1rem',
-                            letterSpacing: '0.08em',
+                            fontSize: 'clamp(3rem, 10vw, 4.5rem)',
+                            lineHeight: 1,
                             marginBottom: '1rem',
                         }}
                     >
-                        Tienes una invitación
+                        Guarda la fecha
                     </motion.p>
 
                     {/* Divider with roses */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center', marginBottom: '0.75rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center', marginBottom: '1.25rem' }}>
                         <RoseSVG />
                         <div style={{ height: '1px', width: '40px', background: 'var(--gold)' }} />
                         <RoseSVG mirror />
@@ -85,29 +84,12 @@ export default function LandingScreen({ onOpen }: LandingScreenProps) {
                             fontWeight: '900',
                             letterSpacing: '0.05em',
                             lineHeight: 1.1,
-                            marginBottom: '0.5rem',
+                            marginBottom: '1.5rem',
                             textShadow: '0 0 20px rgba(201,168,76,0.4)',
                         }}
                     >
                         Brenda & David
                     </motion.h1>
-
-                    {/* "se casan" */}
-                    <motion.p
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.7, duration: 0.6 }}
-                        style={{
-                            fontFamily: 'var(--font-playfair)',
-                            fontStyle: 'italic',
-                            color: 'var(--cream)',
-                            textAlign: 'center',
-                            fontSize: '1.5rem',
-                            marginBottom: '1.5rem',
-                        }}
-                    >
-                        se casan
-                    </motion.p>
 
                     {/* Horseshoe bottom decoration */}
                     <div className="flex justify-center mb-6">

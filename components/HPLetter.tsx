@@ -64,7 +64,7 @@ export default function HPLetter({ guestName, guestId, hasRsvp, rsvpAttending }:
                         <div style={{ background: 'var(--bg-dark)', color: 'var(--bg-parchment)', padding: '1rem 1.5rem', letterSpacing: '4px', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', flexShrink: 0 }}>
                             EXCLUSIVA
                         </div>
-                        <p className="font-sans" style={{ fontSize: '0.9rem', lineHeight: 1.6 }}>
+                        <p className="font-sans" style={{ fontSize: '0.9rem', lineHeight: 1.6, padding: '0rem 1rem' }}>
                             Hay momentos en la vida que son especiales, pero compartirlos con quienes amamos los hace inolvidables. Por eso queremos que seas parte de esta pequeña y muy íntima celebración del amor que nos tenemos.
                         </p>
                     </div>

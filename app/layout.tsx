@@ -29,8 +29,10 @@ const licorice = Licorice({
 
 export const metadata: Metadata = {
     title: 'Brenda & David — Nuestra Boda',
-    description: 'Te invitamos a nuestra boda. Guarda la fecha.',
+    description: 'Te invitamos a nuestra boda. Guarda la fecha.'
 }
+
+import I18nProvider from '../components/I18nProvider'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
@@ -41,9 +43,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <head>
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-                <link href="https://fonts.googleapis.com/css2?family=Manufacturing+Consent&family=Birthstone+Bounce:wght@400;500&display=swap" rel="stylesheet" />
+                <link href="https://fonts.googleapis.com/css2?family=Manufacturing+Consent&family=Birthstone+Bounce:wght@400;500&family=Libre+Caslon+Display&display=swap" rel="stylesheet" />
             </head>
-            <body>{children}</body>
+            <body>
+                <I18nProvider>
+                    {children}
+                </I18nProvider>
+            </body>
         </html>
     )
 }
