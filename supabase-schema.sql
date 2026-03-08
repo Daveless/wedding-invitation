@@ -25,8 +25,12 @@ create table if not exists song_requests (
   id uuid primary key default gen_random_uuid(),
   guest_id uuid references guests(id) on delete cascade,
   song text not null,
+  type text default 'dance', -- 'dance' or 'dinner'
   submitted_at timestamptz default now()
 );
+
+-- Migration: if table already exists, add the type column
+-- alter table song_requests add column if not exists type text default 'dance';
 
 -- ============================================================
 -- ROW LEVEL SECURITY (RLS) POLICIES

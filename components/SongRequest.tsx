@@ -3,16 +3,29 @@
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
-export default function SongRequest({ guestId }: { guestId: string }) {
+interface SongRequestProps {
+    guestId: string
+    type?: 'dance' | 'dinner'
+}
+
+export default function SongRequest({ guestId, type = 'dance' }: SongRequestProps) {
     const [song, setSong] = useState('')
     const [loading, setLoading] = useState(false)
     const [songs, setSongs] = useState<string[]>([])
+
+    const placeholder = type === 'dance'
+        ? 'Ej: Bohemian Rhapsody - Queen'
+        : 'Ej: La Vie En Rose - Édith Piaf'
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!song.trim()) return
         setLoading(true)
-        const { error } = await supabase.from('song_requests').insert({ guest_id: guestId, song: song.trim() })
+        const { error } = await supabase.from('song_requests').insert({
+            guest_id: guestId,
+            song: song.trim(),
+            type,
+        })
         if (!error) {
             setSongs(prev => [...prev, song.trim()])
             setSong('')
@@ -27,7 +40,7 @@ export default function SongRequest({ guestId }: { guestId: string }) {
                     type="text"
                     value={song}
                     onChange={e => setSong(e.target.value)}
-                    placeholder="Ej: Bohemian Rhapsody - Queen"
+                    placeholder={placeholder}
                     className="field"
                     style={{ flex: 1 }}
                 />

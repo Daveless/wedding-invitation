@@ -7,6 +7,8 @@
   --ink-light: #6b5d4f;
   --border: rgb(26 18 8 / 0.18);
   --red-seal: #8b1a10;
+  --font-masthead: 'Manufacturing Consent', serif;
+  --font-birthstone: 'Birthstone Bounce', cursive;
 }
 
 /* ── Reset ───────────────────────────────────── */
@@ -101,6 +103,14 @@ body {
 
 .sans {
   font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+.masthead {
+  font-family: var(--font-masthead);
+}
+
+.birthstone {
+  font-family: var(--font-birthstone);
 }
 
 p,
