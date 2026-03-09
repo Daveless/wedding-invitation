@@ -26,8 +26,7 @@ export default function SongRequest({ guestId, type = 'dance' }: SongRequestProp
         setLoading(true)
         const { error } = await supabase.from('song_requests').insert({
             guest_id: guestId,
-            song: song.trim(),
-            type,
+            song: song.trim()
         })
         if (!error) {
             setSongs(prev => [...prev, song.trim()])

@@ -62,7 +62,7 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
             <div style={{
                 position: 'relative',
                 width: '100%',
-                height: '100vh',
+                height: '100dvh',
                 overflow: 'hidden',
                 marginBottom: 0,
             }}>
