@@ -111,8 +111,9 @@ export default function EnvelopeScene({ onOpen, guestName }: { onOpen: () => voi
                             }}>Para</p>
                             <p style={{
                                 fontFamily: 'var(--font-birthstone)',
-                                fontSize: 'clamp(2rem, 7.5vw, 3.4rem)',
-                                lineHeight: 1.1, wordBreak: 'break-word', color: '#3d3320',
+                                fontSize: 'clamp(2.5rem, 8vw, 3.8rem)',
+                                lineHeight: 1.1, color: '#3d3320',
+                                padding: '0 1rem'
                             }}>
                                 {guestName || 'Estimado Invitado'}
                             </p>
@@ -175,7 +176,12 @@ export default function EnvelopeScene({ onOpen, guestName }: { onOpen: () => voi
                             <img
                                 src="/portada-invitacion.png"
                                 alt="Portada"
-                                style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', opacity: 0.92 }}
+                                draggable={false}
+                                style={{
+                                    width: '100%', height: '100%',
+                                    objectFit: 'cover', objectPosition: 'top',
+                                    opacity: 0.92, pointerEvents: 'none'
+                                }}
                             />
                         </motion.div>
 

@@ -21,7 +21,6 @@
 }
 
 html {
-  scroll-behavior: smooth;
   background: #0d0a04;
 }
 
@@ -221,18 +220,4 @@ li {
     flex: unset;
     width: 100%;
   }
-}
-
-/* ── Scrollbar ────────────────────────────────── */
-::-webkit-scrollbar {
-  width: 5px;
-}
-
-::-webkit-scrollbar-track {
-  background: #1a1208;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(200, 180, 130, .4);
-  border-radius: 2px;
 }

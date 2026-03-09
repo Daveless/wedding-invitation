@@ -69,12 +69,14 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                 <img
                     src="/CELEBRACION.jpg"
                     alt="David y Brenda"
+                    draggable={false}
                     style={{
                         width: '100%',
                         height: '100%',
                         objectFit: 'cover',
                         objectPosition: 'center',
                         display: 'block',
+                        pointerEvents: 'none',
                     }}
                 />
                 {/* Dark gradient overlay at bottom */}
