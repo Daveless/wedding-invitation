@@ -14,21 +14,19 @@ const PARTICLES = Array.from({ length: 28 }, (_, i) => ({
     rise: Math.random() * 90 + 30,
 }))
 
-// Y-coordinate (as % of height) where all 4 fold-lines meet in the front face
-const CP = 51.4
+const CP = 51.4 // % from top where fold lines meet
 
 export default function EnvelopeScene({ onOpen, guestName }: { onOpen: () => void, guestName?: string }) {
     /**
      * Phase map:
-     *  0  idle       → back face visible, guest name, floating
-     *  1  flipping   → both faces animating (back→-180, front→0)
-     *  2  front      → front face fully visible, seal shown
-     *  3  flap-open  → top flap rotates up
-     *  4  paper-up   → letter slides out of envelope
-     *  5  expand     → fixed fullscreen overlay grows from center
-     *  6  done       → onOpen() fired
+     *  0  idle      → back face, name, floating
+     *  1  flipping  → back -180, front 0
+     *  2  front     → seal visible instantly
+     *  3  flap-open → flap rotates back
+     *  4  paper-up  → paper slides up, triangles fade, paper emerges above flap
+     *  5  done      → bg fades + onOpen() fires mid-fade
      */
-    const [phase, setPhase] = useState<0 | 1 | 2 | 3 | 4 | 5 | 6>(0)
+    const [phase, setPhase] = useState<0 | 1 | 2 | 3 | 4 | 5>(0)
     const [hint, setHint] = useState(false)
 
     useEffect(() => {
@@ -39,25 +37,21 @@ export default function EnvelopeScene({ onOpen, guestName }: { onOpen: () => voi
     const handleClick = () => {
         if (phase !== 0) return
         setPhase(1)
-        setTimeout(() => setPhase(2), 900)    // flip complete → show stable front
+        setTimeout(() => setPhase(2), 900)    // flip done
         setTimeout(() => setPhase(3), 1600)   // flap opens
-        setTimeout(() => setPhase(4), 2500)   // paper slides up
-        setTimeout(() => setPhase(5), 3300)   // fullscreen expand
-        setTimeout(() => { setPhase(6); onOpen() }, 4500)
+        setTimeout(() => setPhase(4), 2500)   // paper slides up, triangles fade
+        // At 3600ms the paper has been visible for ~1.1s.
+        // Fire onOpen() here so the letter starts mounting while the dark
+        // background is still fading — the existing AnimatePresence in
+        // InvitationClient does a clean fade-to-letter transition.
+        setTimeout(() => { setPhase(5); onOpen() }, 3600)
     }
 
-    const flipped = phase >= 1  // flip started
+    const flipped = phase >= 1
     const flapOpen = phase >= 3
     const paperUp = phase >= 4
-    const expanding = phase >= 5
     const bgFade = phase >= 5
 
-    /* ── Standard CSS card-flip: each face animates its OWN rotateY ──────────
-       Back face  : start=0°  → flipped=-180°   (face away from viewer)
-       Front face : start=180° → flipped=0°      (face toward viewer)
-       Both have backfaceVisibility:hidden + parent preserve-3d.
-       This is the most reliable cross-browser approach.
-    ─────────────────────────────────────────────────────────────────────── */
     const backRotateY = flipped ? -180 : 0
     const frontRotateY = flipped ? 0 : 180
 
@@ -72,7 +66,7 @@ export default function EnvelopeScene({ onOpen, guestName }: { onOpen: () => voi
                 overflow: 'hidden',
             }}
             animate={{ opacity: bgFade ? 0 : 1 }}
-            transition={{ duration: 1.2, delay: bgFade ? 0.9 : 0 }}
+            transition={{ duration: 1.0, delay: bgFade ? 0 : 0 }}
         >
             {/* Ambient glow */}
             <div style={{
@@ -81,7 +75,7 @@ export default function EnvelopeScene({ onOpen, guestName }: { onOpen: () => voi
                 top: '25%', left: '20%', pointerEvents: 'none',
             }} />
 
-            {/* Floating dust particles */}
+            {/* Dust particles */}
             {PARTICLES.map(p => (
                 <motion.div
                     key={p.id}
@@ -98,57 +92,15 @@ export default function EnvelopeScene({ onOpen, guestName }: { onOpen: () => voi
                 />
             ))}
 
-            {/* ══════════════════════════════════════════════════
-                FIXED FULLSCREEN OVERLAY (phase 5)
-                Expands from envelope-center → fills screen
-            ══════════════════════════════════════════════════ */}
-            <AnimatePresence>
-                {expanding && (
-                    <motion.div
-                        key="fullscreen"
-                        style={{
-                            position: 'fixed', inset: 0, zIndex: 500,
-                            overflow: 'hidden',
-                        }}
-                        initial={{ clipPath: 'inset(36% 20% 36% 20% round 4px)' }}
-                        animate={{ clipPath: 'inset(0% 0% 0% 0% round 0px)' }}
-                        transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
-                    >
-                        <img
-                            src="/portada-invitacion.png"
-                            alt="Portada"
-                            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }}
-                        />
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
-            {/* ══════════════════════════════════════════════════
-                ENVELOPE CARD FRAME
-                No rotation on the frame itself — each face
-                carries its own rotateY animation.
-                perspective + preserve-3d enable the 3-D flip.
-            ══════════════════════════════════════════════════ */}
+            {/* ══ ENVELOPE ══ */}
             <motion.div
                 animate={{ y: phase === 0 ? [0, -9, 0] : 0 }}
                 transition={{ y: { duration: 3.5, repeat: phase === 0 ? Infinity : 0, ease: 'easeInOut' } }}
-                style={{
-                    position: 'relative',
-                    width: 'min(92vw, 520px)',
-                    perspective: '1400px',
-                }}
+                style={{ position: 'relative', width: 'min(92vw, 520px)', perspective: '1400px' }}
             >
-                {/* Aspect-ratio wrapper — preserve-3d so children exist in 3-D space */}
-                <div style={{
-                    position: 'relative', width: '100%', paddingTop: '66%',
-                    transformStyle: 'preserve-3d',
-                }}>
+                <div style={{ position: 'relative', width: '100%', paddingTop: '66%', transformStyle: 'preserve-3d' }}>
 
-                    {/* ─────────────────────────────────────────
-                        BACK FACE
-                        Phase 0: rotateY=0   → facing viewer
-                        After flip: rotateY=-180 → hidden
-                    ───────────────────────────────────────── */}
+                    {/* ── BACK FACE — completely clean ── */}
                     <motion.div
                         animate={{ rotateY: backRotateY }}
                         transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
@@ -162,33 +114,17 @@ export default function EnvelopeScene({ onOpen, guestName }: { onOpen: () => voi
                             overflow: 'hidden',
                         }}
                     >
-                        {/* Back of envelope: ONLY bottom-V seam (no X) */}
-                        <svg
-                            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
-                            viewBox="0 0 320 210" preserveAspectRatio="none"
-                        >
-                            <line x1="0" y1="210" x2="160" y2="130" stroke="#c8bfa0" strokeWidth="1" opacity="0.55" />
-                            <line x1="320" y1="210" x2="160" y2="130" stroke="#c8bfa0" strokeWidth="1" opacity="0.55" />
-                            {/* Horizontal center seam */}
-                            <line x1="0" y1="130" x2="320" y2="130" stroke="#c8bfa0" strokeWidth="0.6" opacity="0.25" />
-                        </svg>
-
-                        {/* Subtle edge shading */}
                         <div style={{
                             position: 'absolute', inset: 0, pointerEvents: 'none',
-                            background: 'linear-gradient(to right, rgba(0,0,0,0.025) 0%, transparent 18%, transparent 82%, rgba(0,0,0,0.025) 100%)',
+                            background: 'linear-gradient(to right, rgba(0,0,0,0.02) 0%, transparent 15%, transparent 85%, rgba(0,0,0,0.02) 100%)',
                         }} />
-
-                        {/* Guest name — centred on back face */}
                         <div style={{ position: 'relative', zIndex: 5, textAlign: 'center', padding: '0 10%' }}>
                             <p style={{
                                 fontFamily: 'var(--font-sans)',
                                 fontSize: 'clamp(0.55rem, 1.5vw, 0.72rem)',
                                 letterSpacing: '5px', textTransform: 'uppercase',
                                 marginBottom: '0.4rem', color: '#7a6845',
-                            }}>
-                                Para
-                            </p>
+                            }}>Para</p>
                             <p style={{
                                 fontFamily: 'var(--font-birthstone)',
                                 fontSize: 'clamp(2rem, 7.5vw, 3.4rem)',
@@ -199,11 +135,7 @@ export default function EnvelopeScene({ onOpen, guestName }: { onOpen: () => voi
                         </div>
                     </motion.div>
 
-                    {/* ─────────────────────────────────────────
-                        FRONT FACE
-                        Phase 0: rotateY=180 → hidden (behind)
-                        After flip: rotateY=0 → facing viewer
-                    ───────────────────────────────────────── */}
+                    {/* ── FRONT FACE — no overflow:hidden (paper must escape upward) ── */}
                     <motion.div
                         animate={{ rotateY: frontRotateY }}
                         transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
@@ -213,22 +145,25 @@ export default function EnvelopeScene({ onOpen, guestName }: { onOpen: () => voi
                             borderRadius: '3px',
                             boxShadow: '0 22px 60px rgba(0,0,0,0.65), 0 6px 20px rgba(0,0,0,0.38)',
                             backfaceVisibility: 'hidden',
-                            overflow: 'hidden',
                         }}
                     >
-                        {/* ── Letter paper (z-index 2, BELOW the triangle overlays) ── */}
+                        {/* ── Letter paper ──
+                            While inside (paperUp=false): z-index 2, triangles (z-5) layer over it.
+                            When sliding (paperUp=true): z-index 20, above flap (z-10) and triangles.
+                            Triangles fade out simultaneously so paper is unobstructed.
+                        ── */}
                         <motion.div
                             style={{
                                 position: 'absolute',
                                 bottom: 0, left: '8%', right: '8%',
                                 background: '#f0ebe0',
                                 borderRadius: '2px 2px 0 0',
-                                zIndex: 2,
+                                zIndex: paperUp ? 20 : 2,
                                 overflow: 'hidden',
                             }}
                             initial={{ height: 0 }}
-                            animate={paperUp ? { height: '94%' } : {}}
-                            transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+                            animate={paperUp ? { height: '120%' } : {}}
+                            transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1], delay: 0.05 }}
                         >
                             <img
                                 src="/portada-invitacion.png"
@@ -237,26 +172,36 @@ export default function EnvelopeScene({ onOpen, guestName }: { onOpen: () => voi
                             />
                         </motion.div>
 
-                        {/* ── LEFT flap triangle — over paper (z-index 5) ── */}
-                        <div style={{
-                            position: 'absolute', inset: 0, zIndex: 5, pointerEvents: 'none',
-                            clipPath: `polygon(0 0, 0 100%, 50% ${CP}%)`,
-                            background: 'linear-gradient(110deg, #ede5cc 0%, #f5f0e3 60%)',
-                        }} />
-                        {/* ── RIGHT flap triangle ── */}
-                        <div style={{
-                            position: 'absolute', inset: 0, zIndex: 5, pointerEvents: 'none',
-                            clipPath: `polygon(100% 0, 100% 100%, 50% ${CP}%)`,
-                            background: 'linear-gradient(250deg, #e8dfca 0%, #f5f0e3 60%)',
-                        }} />
-                        {/* ── BOTTOM flap triangle ── */}
-                        <div style={{
-                            position: 'absolute', inset: 0, zIndex: 5, pointerEvents: 'none',
-                            clipPath: `polygon(0 100%, 100% 100%, 50% ${CP}%)`,
-                            background: 'linear-gradient(to top, #e0d8be 0%, #f0ead5 50%)',
-                        }} />
+                        {/* ── Triangle flap overlays ──
+                            Visible while paper is inside (gives "inside envelope" look).
+                            Fade OUT instantly when paper slides so it's unobstructed.
+                        ── */}
+                        <motion.div
+                            style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
+                            animate={{ opacity: paperUp ? 0 : 1 }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            {/* Left */}
+                            <div style={{
+                                position: 'absolute', inset: 0, zIndex: 5,
+                                clipPath: `polygon(0 0, 0 100%, 50% ${CP}%)`,
+                                background: 'linear-gradient(110deg, #ede5cc 0%, #f5f0e3 60%)',
+                            }} />
+                            {/* Right */}
+                            <div style={{
+                                position: 'absolute', inset: 0, zIndex: 5,
+                                clipPath: `polygon(100% 0, 100% 100%, 50% ${CP}%)`,
+                                background: 'linear-gradient(250deg, #e8dfca 0%, #f5f0e3 60%)',
+                            }} />
+                            {/* Bottom */}
+                            <div style={{
+                                position: 'absolute', inset: 0, zIndex: 5,
+                                clipPath: `polygon(0 100%, 100% 100%, 50% ${CP}%)`,
+                                background: 'linear-gradient(to top, #e0d8be 0%, #f0ead5 50%)',
+                            }} />
+                        </motion.div>
 
-                        {/* ── Fold-X lines (above triangles) ── */}
+                        {/* Fold-X lines */}
                         <svg
                             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 6 }}
                             viewBox="0 0 320 210" preserveAspectRatio="none"
@@ -268,14 +213,7 @@ export default function EnvelopeScene({ onOpen, guestName }: { onOpen: () => voi
                         </svg>
                     </motion.div>
 
-                    {/* ─────────────────────────────────────────
-                        TOP FLAP
-                        Rendered as a sibling (outside overflow:
-                        hidden) and animated via rotateX.
-                        We conditionally render it only when the
-                        front face is visible (phase ≥ 2) so it
-                        doesn't appear on the back.
-                    ───────────────────────────────────────── */}
+                    {/* ── TOP FLAP — z-index 10, hidden until front is visible ── */}
                     {phase >= 2 && (
                         <motion.div
                             style={{
@@ -294,27 +232,18 @@ export default function EnvelopeScene({ onOpen, guestName }: { onOpen: () => voi
                         />
                     )}
 
-                    {/* ─────────────────────────────────────────
-                        WAX SEAL
-                        Only rendered on front face (phase ≥ 2).
-                        Disappears when flap opens (phase ≥ 3).
-                    ───────────────────────────────────────── */}
+                    {/* ── WAX SEAL — instant appearance, disappears when flap opens ── */}
                     {phase >= 2 && (
                         <motion.div
-                            style={{
-                                position: 'absolute',
-                                top: '42%', left: '50%',
-                                translate: '-50% -50%',
-                                zIndex: 15,
-                            }}
-                            initial={{ scale: 0.6, opacity: 0 }}
+                            style={{ position: 'absolute', top: '42%', left: '50%', translate: '-50% -50%', zIndex: 15 }}
+                            initial={{ scale: 1, opacity: 1 }}
                             animate={flapOpen
-                                ? { scale: 0.3, opacity: 0, rotate: 25 }
+                                ? { scale: 0.3, opacity: 0, rotate: 20 }
                                 : { scale: 1, opacity: 1, rotate: 0 }
                             }
                             transition={flapOpen
-                                ? { duration: 0.38, ease: [0.6, 0, 1, 0.8] }
-                                : { duration: 0.4, ease: [0.22, 1, 0.36, 1] }
+                                ? { duration: 0.32, ease: [0.6, 0, 1, 0.8] }
+                                : { duration: 0 }
                             }
                         >
                             <svg width="100" height="100" viewBox="0 0 100 100">
