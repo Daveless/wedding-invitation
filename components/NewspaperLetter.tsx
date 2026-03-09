@@ -389,6 +389,30 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                 </Reveal>
 
                 {/*─────────────────────────────────────────
+                PASE PARA X PERSONA (BEFORE INFO)
+                ───────────────────────────────────────── */}
+                <Reveal>
+                    <div style={{ marginBottom: '3rem' }}>
+                        <div style={{
+                            border: '1px solid rgba(26,18,8,0.15)',
+                            padding: '1.5rem 1rem',
+                            borderRadius: '6px',
+                            background: '#fff',
+                            boxShadow: '0 4px 15px rgba(0,0,0,0.06)',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center'
+                        }}>
+                            <img src="/seccion-pago.jpeg" alt="Pase" style={{ width: '100%', height: 'auto', display: 'block', marginBottom: '1.25rem', borderRadius: '4px' }} />
+                            <h3 className="serif" style={{ fontSize: '1.3rem', fontStyle: 'italic', marginBottom: '0.2rem', fontWeight: 600 }}>{t('pase1Persona')}</h3>
+                            <p className="birthstone" style={{ fontSize: '2rem', color: 'var(--ink)' }}>{guestName}</p>
+                            <hr style={{ width: '40px', border: 'none', borderTop: '1px solid var(--ink)', margin: '0.5rem 0 1rem' }} />
+                            <p style={{ textAlign: 'center', fontSize: '0.85rem', lineHeight: 1.6 }}>{t('paseTexto')}</p>
+                        </div>
+                    </div>
+                </Reveal>
+
+                {/*─────────────────────────────────────────
                 INFORMACIÓN section
                 ───────────────────────────────────────── */}
                 <Reveal>
@@ -530,28 +554,6 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
 
                 <hr className="rule-double" />
 
-                <Reveal>
-                    <div style={{ marginBottom: '3rem' }}>
-                        <div style={{
-                            border: '1px solid rgba(26,18,8,0.15)',
-                            padding: '1.5rem 1rem',
-                            borderRadius: '6px',
-                            background: '#fff',
-                            boxShadow: '0 4px 15px rgba(0,0,0,0.06)',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center'
-                        }}>
-                            <img src="/seccion-pago.jpeg" alt="Pase" style={{ width: '100%', height: 'auto', display: 'block', marginBottom: '1.25rem', borderRadius: '4px' }} />
-                            <h3 className="serif" style={{ fontSize: '1.3rem', fontStyle: 'italic', marginBottom: '0.5rem', fontWeight: 600 }}>{t('pase1Persona')}</h3>
-                            <hr style={{ width: '40px', border: 'none', borderTop: '1px solid var(--ink)', margin: '0.5rem 0 1rem' }} />
-                            <p style={{ textAlign: 'center', fontSize: '0.85rem', lineHeight: 1.6 }}>{t('paseTexto')}</p>
-                        </div>
-                    </div>
-                </Reveal>
-
-                <hr className="rule-double" />
-
                 {/*─────────────────────────────────────────
                 TRANSPORTE
                 ───────────────────────────────────────── */}
@@ -650,14 +652,8 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                 ───────────────────────────────────────── */}
                 <Reveal>
                     <div style={{ marginBottom: '2.5rem', textAlign: 'center' }}>
-                        <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
-                            <img src="/regalos.png" alt="Regalos" style={{ width: '80%', height: 'auto', display: 'block' }} />
-                            <div className="birthstone" style={{ width: '100%', position: 'absolute', top: '20%', right: '0%', transform: 'translate(15%, -50%)', fontSize: '4rem', color: '#000000', whiteSpace: 'nowrap', lineHeight: 1, fontWeight: 500 }}>
-                                Regalo
-                            </div>
-                            <div className="birthstone" style={{ width: '100%', position: 'absolute', top: '32%', right: '0%', transform: 'translate(25%, -50%)', fontSize: '4rem', color: '#000000', whiteSpace: 'nowrap', lineHeight: 1, fontWeight: 500 }}>
-                                de bodas
-                            </div>
+                        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+                            <img src="/regalos.png" alt="Regalo de bodas" style={{ width: '100%', height: 'auto', display: 'block' }} />
                         </div>
 
                         <p style={{
@@ -711,11 +707,25 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                 FOOTER SIGNATURE
                 ───────────────────────────────────────── */}
                 <Reveal>
-                    <div style={{ textAlign: 'center', paddingTop: '1rem' }}>
+                    <div style={{ textAlign: 'center', paddingTop: '1rem', paddingBottom: '2.5rem' }}>
                         <span className="birthstone" style={{ fontSize: 'clamp(3rem, 12vw, 5rem)', display: 'block' }}>Brenda &amp; David</span>
-                        <p className="sans" style={{ fontSize: '0.65rem', letterSpacing: '4px', textTransform: 'uppercase', color: 'var(--ink-light)', marginTop: '0.5rem', textAlign: 'center', marginRight: '-4px' }}>
+                        <p className="sans" style={{ fontSize: '0.65rem', letterSpacing: '4px', textTransform: 'uppercase', color: 'var(--ink-light)', marginTop: '0.5rem', marginBottom: '2.5rem', textAlign: 'center', marginRight: '-4px' }}>
                             24 · 04 · 2026 · Quito, Ecuador
                         </p>
+                        <img
+                            src="/colage-final.jpeg"
+                            alt="Colage Final"
+                            style={{
+                                width: '100%',
+                                maxWidth: '500px',
+                                height: 'auto',
+                                display: 'block',
+                                margin: '0 auto',
+                                borderRadius: '4px',
+                                border: '1px solid rgba(26,18,8,0.2)',
+                                boxShadow: '0 8px 24px rgba(0,0,0,0.1)'
+                            }}
+                        />
                     </div>
                 </Reveal>
 
@@ -727,14 +737,14 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
 
             {/* ─── BANK MODAL ─── */}
             {showBank && (
-                <Modal onClose={() => setShowBank(false)} title="Transferencia — Produbanco">
+                <Modal onClose={() => setShowBank(false)} title="Transferencia">
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
                         {[
-                            { label: t('banco'), value: 'Produbanco' },
-                            { label: t('titular'), value: 'Brenda [Apellido] / David [Apellido]' },
+                            { label: t('banco'), value: process.env.NEXT_PUBLIC_BANK_NAME || 'Produbanco' },
+                            { label: t('titular'), value: process.env.NEXT_PUBLIC_BANK_HOLDER || 'Brenda / David' },
                             { label: t('tipoCuenta'), value: t('tipoCuentaValor') },
-                            { label: t('numeroCuenta'), value: '0000000000' },
-                            { label: 'Cédula / RUC', value: '0000000000' },
+                            { label: t('numCuenta'), value: process.env.NEXT_PUBLIC_BANK_ACCOUNT || '0000000000' },
+                            { label: t('cedula'), value: process.env.NEXT_PUBLIC_BANK_ID || '0000000000' },
                         ].map((row, i, arr) => (
                             <div key={row.label} style={{
                                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -747,9 +757,7 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                             </div>
                         ))}
                     </div>
-                    <p style={{ textAlign: 'center', fontSize: '0.78rem', color: 'var(--ink-light)', marginTop: '1rem', fontStyle: 'italic' }}>
-                        {t('notaTransferencia')}
-                    </p>
+
                 </Modal>
             )}
 
@@ -759,12 +767,12 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                     <div style={{ textAlign: 'center', padding: '1rem 0' }}>
                         <PaypalIcon size={48} />
                         <p className="serif" style={{ fontSize: '1.1rem', fontWeight: 600, margin: '1rem 0 0.25rem', textAlign: 'center' }}>
-                            paypal.me/[usuario]
+                            {process.env.NEXT_PUBLIC_PAYPAL_URL?.replace('https://', '') || 'paypal.me/[usuario]'}
                         </p>
                         <p style={{ textAlign: 'center', fontSize: '0.82rem', color: 'var(--ink-mid)' }} dangerouslySetInnerHTML={{ __html: t('notaPaypal') }}>
                         </p>
                         <a
-                            href="https://paypal.me/[usuario]"
+                            href={process.env.NEXT_PUBLIC_PAYPAL_URL || "https://paypal.me/[usuario]"}
                             target="_blank"
                             rel="noopener noreferrer"
                             style={{

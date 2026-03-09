@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import TattooPattern from '@/components/TattooPattern'
 
 export default function AdminLoginPage() {
     const [password, setPassword] = useState('')
@@ -34,44 +33,49 @@ export default function AdminLoginPage() {
             minHeight: '100vh', display: 'flex',
             alignItems: 'center', justifyContent: 'center',
             padding: '2rem', position: 'relative',
+            background: 'var(--paper)',
+            color: 'var(--ink)'
         }}>
-            <TattooPattern />
             <div style={{
                 position: 'relative', zIndex: 1,
                 width: '100%', maxWidth: '380px',
             }}>
                 <div style={{
-                    border: '2px solid var(--gold)',
                     padding: '2.5rem 2rem',
-                    background: 'rgba(10,22,40,0.95)',
+                    background: 'var(--paper)',
+                    border: '1px solid rgba(26,18,8,0.2)',
+                    boxShadow: '0 4px 15px rgba(0,0,0,0.05)',
                 }}>
-                    <div style={{ position: 'absolute', inset: '8px', border: '1px solid rgba(201,168,76,0.3)', pointerEvents: 'none' }} />
+                    <hr className="rule-double" style={{ margin: '0 0 1.5rem', opacity: 0.6 }} />
 
                     <h1 style={{
-                        fontFamily: 'var(--font-cinzel)',
-                        color: 'var(--gold)',
-                        fontSize: '1.3rem',
+                        fontFamily: "'Libre Caslon Display', serif",
+                        color: 'var(--ink)',
+                        fontSize: '1.4rem',
                         textAlign: 'center',
-                        letterSpacing: '0.1em',
-                        marginBottom: '0.5rem',
+                        letterSpacing: '0.05em',
+                        marginBottom: '0.25rem',
+                        fontWeight: 600,
                     }}>
-                        Panel Admin
+                        ADMIN JOURNAL
                     </h1>
                     <p style={{
-                        fontFamily: 'var(--font-lora)', fontStyle: 'italic',
-                        color: 'var(--cream)', opacity: 0.6,
-                        textAlign: 'center', fontSize: '0.85rem', marginBottom: '2rem',
+                        fontFamily: 'var(--font-birthstone)',
+                        color: 'var(--ink-mid)',
+                        textAlign: 'center', fontSize: '1.6rem', marginBottom: '1.5rem',
+                        lineHeight: 1
                     }}>
-                        Brenda & David — Invitaciones
+                        Brenda & David
                     </p>
 
                     <form onSubmit={handleSubmit}>
                         <div style={{ marginBottom: '1.25rem' }}>
                             <label style={{
                                 display: 'block',
-                                fontFamily: 'var(--font-lora)', color: 'var(--gold)',
+                                fontFamily: "'Inter', sans-serif", color: 'var(--ink-mid)',
                                 fontSize: '0.75rem', letterSpacing: '0.1em',
                                 textTransform: 'uppercase', marginBottom: '0.5rem',
+                                fontWeight: 600
                             }}>
                                 Contraseña
                             </label>
@@ -84,11 +88,17 @@ export default function AdminLoginPage() {
                                 autoComplete="current-password"
                                 aria-label="Contraseña de administrador"
                                 required
+                                style={{
+                                    border: '1px solid rgba(26,18,8,0.2)',
+                                    background: 'rgba(255,255,255,0.4)',
+                                    color: 'var(--ink)',
+                                    fontWeight: 500
+                                }}
                             />
                         </div>
 
                         {error && (
-                            <p style={{ color: 'var(--red)', fontSize: '0.85rem', marginBottom: '1rem', fontFamily: 'var(--font-lora)' }}>
+                            <p style={{ color: '#990000', fontSize: '0.85rem', marginBottom: '1rem', fontFamily: "'Inter', sans-serif", fontWeight: 500 }}>
                                 {error}
                             </p>
                         )}
@@ -96,13 +106,15 @@ export default function AdminLoginPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="btn-vintage"
-                            style={{ width: '100%' }}
+                            className="btn-ink"
+                            style={{ width: '100%', padding: '0.8rem 1rem', fontSize: '0.85rem', marginTop: '0.5rem' }}
                             aria-label="Iniciar sesión"
                         >
-                            {loading ? 'Verificando...' : 'Entrar'}
+                            {loading ? 'VERIFICANDO...' : 'ENTRAR AL PANEL'}
                         </button>
                     </form>
+
+                    <hr className="rule-double" style={{ margin: '2rem 0 0', opacity: 0.6 }} />
                 </div>
             </div>
         </div>

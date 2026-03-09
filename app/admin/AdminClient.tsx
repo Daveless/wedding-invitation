@@ -23,6 +23,7 @@ interface SongReq {
     id: string
     guest_id: string
     song: string
+    type?: string
     submitted_at: string
     guests?: { name: string } | { name: string }[] | any
 }
@@ -485,8 +486,13 @@ export default function AdminClient({ guests, rsvps, songs, rsvpMap }: AdminClie
                                                 }}>
                                                     {String(i + 1).padStart(2, '0')}
                                                 </span>
-                                                <span style={{ color: '#f1f5f9', flex: 1, fontSize: '0.9rem' }}>
+                                                <span style={{ color: '#f1f5f9', flex: 1, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                                     {s_item.song}
+                                                    {s_item.type === 'dinner' ? (
+                                                        <span style={{ fontSize: '0.65rem', background: 'rgba(244, 114, 182, 0.15)', color: '#f472b6', padding: '0.1rem 0.4rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>🍽️ Cena</span>
+                                                    ) : (
+                                                        <span style={{ fontSize: '0.65rem', background: 'rgba(96, 165, 250, 0.15)', color: '#60a5fa', padding: '0.1rem 0.4rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>🕺 Fiesta</span>
+                                                    )}
                                                 </span>
                                                 <span style={{
                                                     color: 'rgba(255,255,255,0.3)',

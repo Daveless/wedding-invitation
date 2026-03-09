@@ -1,6 +1,8 @@
 import { createServiceClient } from '@/lib/supabase'
 import AdminClient from './AdminClient'
 
+export const dynamic = 'force-dynamic' // <== Bypass Next.js static caching!
+
 export default async function AdminPage() {
     const supabase = createServiceClient()
 
@@ -19,7 +21,7 @@ export default async function AdminPage() {
     // Fetch all song requests with guest name
     const { data: songs } = await supabase
         .from('song_requests')
-        .select('id, guest_id, song, submitted_at, guests(name)')
+        .select('id, guest_id, song, type, submitted_at, guests(name)')
         .order('submitted_at', { ascending: false })
 
     // Map RSVP by guest_id

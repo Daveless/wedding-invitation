@@ -40,6 +40,7 @@ body {
   background-color: var(--parchment);
   min-height: 100dvh;
   position: relative;
+  overflow-x: hidden;
   /* Parchment vintage and worn texture */
   background-image: url('/fondo-5.jpg');
   background-size: contain;

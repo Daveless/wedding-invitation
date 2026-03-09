@@ -44,6 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link href="https://fonts.googleapis.com/css2?family=Manufacturing+Consent&family=Birthstone+Bounce:wght@400;500&family=Libre+Caslon+Display&display=swap" rel="stylesheet" />
+                <link href="https://fonts.googleapis.com/css2?family=Meddon&display=swap" rel="stylesheet" />
             </head>
             <body>
                 <I18nProvider>
