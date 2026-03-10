@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import { read, utils } from 'xlsx'
 
 interface Guest {
     id: string
@@ -42,7 +43,28 @@ export default function AdminClient({ guests, rsvps, songs, rsvpMap }: AdminClie
     const [localGuests, setLocalGuests] = useState<Guest[]>(guests)
     const [copied, setCopied] = useState<string | null>(null)
     const [addError, setAddError] = useState('')
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+    const [importing, setImporting] = useState(false)
+    const [deletingId, setDeletingId] = useState<string | null>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
+    const defaultTemplate = "Hola \u2728\n¿Cómo estás?\n\nHoy me acordé de ti y quise escribirte.\nQuería compartirte algo y prefiero que lo descubras directamente aquí:\n\n[link]\n\n\uD83D\uDE01"
+    const [whatsappMessage, setWhatsappMessage] = useState(defaultTemplate)
     const router = useRouter()
+
+    useEffect(() => {
+        const saved = localStorage.getItem('admin_whatsapp_template')
+        if (saved) {
+            setWhatsappMessage(saved)
+        }
+    }, [])
+
+    const handleTemplateChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const val = e.target.value
+        setWhatsappMessage(val)
+        localStorage.setItem('admin_whatsapp_template', val)
+    }
+
+    const toggleSidebar = () => setIsSidebarOpen(prev => !prev)
 
     const handleLogout = () => {
         document.cookie = 'admin_session=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/'
@@ -70,6 +92,107 @@ export default function AdminClient({ guests, rsvps, songs, rsvpMap }: AdminClie
         setAdding(false)
     }
 
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+
+        setImporting(true)
+        setAddError('')
+        try {
+            const data = await file.arrayBuffer()
+            const workbook = read(data)
+            const firstSheetName = workbook.SheetNames[0]
+            const worksheet = workbook.Sheets[firstSheetName]
+
+            // Generate array of arrays
+            const json: any[][] = utils.sheet_to_json(worksheet, { header: 1 })
+            console.log('Parsed Excel JSON (bruto):', json)
+
+            // Find the best column index that contains actual text (names) instead of just numbers (IDs)
+            let bestColIndex = 0;
+            if (json.length > 0) {
+                const maxCols = Math.max(...json.map(row => row.length));
+                for (let col = 0; col < maxCols; col++) {
+                    const colData = json.map(row => row[col]).filter(val => val != null && String(val).trim() !== '');
+                    // Check if this column has mostly non-numeric strings
+                    const textCount = colData.filter(val => isNaN(Number(String(val).trim()))).length;
+                    if (textCount > 0 && textCount > colData.length * 0.5) {
+                        bestColIndex = col;
+                        break;
+                    }
+                }
+            }
+
+            // Extract the detected column of each row, filtering empty and pure numbers
+            const namesToImport = json
+                .map(row => row[bestColIndex])
+                .filter(name => name != null && String(name).trim().length > 0)
+                .map(name => String(name).trim())
+                .filter(name => isNaN(Number(name))) // Remove purely numeric rows (like "1", "2")
+
+            console.log(`Nombres extraídos de la columna ${bestColIndex}:`, namesToImport)
+
+            if (namesToImport.length === 0) {
+                setAddError('El archivo no contiene nombres válidos en la primera columna.')
+                setImporting(false)
+                if (fileInputRef.current) fileInputRef.current.value = ''
+                return
+            }
+
+            const newGuests: Guest[] = []
+            // Process sequentially to be safe
+            for (const name of namesToImport) {
+                const res = await fetch('/api/admin/guests', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: name.trim() }),
+                })
+                if (res.ok) {
+                    const { guest } = await res.json()
+                    newGuests.push(guest)
+                }
+            }
+
+            setLocalGuests(prev => [...newGuests.reverse(), ...prev])
+            if (newGuests.length < namesToImport.length) {
+                setAddError(`Se importaron ${newGuests.length} de ${namesToImport.length} invitados. Algunos fallaron.`)
+            }
+
+        } catch (err: any) {
+            console.error('Error importing excel:', err)
+            setAddError('Error al procesar el archivo Excel.')
+        } finally {
+            setImporting(false)
+            if (fileInputRef.current) fileInputRef.current.value = ''
+        }
+    }
+
+    const handleDeleteGuest = async (id: string, name: string) => {
+        if (!window.confirm(`¿Seguro que deseas eliminar a ${name}? Esta acción no se puede deshacer y borrará también sus confirmaciones de asistencia y peticiones de canciones.`)) {
+            return
+        }
+
+        setDeletingId(id)
+        try {
+            const res = await fetch('/api/admin/guests', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id }),
+            })
+            if (res.ok) {
+                setLocalGuests(prev => prev.filter(g => g.id !== id))
+            } else {
+                const { error } = await res.json()
+                alert(`Error al eliminar: ${error}`)
+            }
+        } catch (err) {
+            console.error('Error deleting guest:', err)
+            alert('Ocurrió un error al intentar eliminar al invitado.')
+        } finally {
+            setDeletingId(null)
+        }
+    }
+
     const copyText = (text: string, id: string) => {
         navigator.clipboard.writeText(text)
         setCopied(id)
@@ -87,7 +210,17 @@ export default function AdminClient({ guests, rsvps, songs, rsvpMap }: AdminClie
     ]
 
     return (
-        <div style={{ minHeight: '100vh', background: '#0f172a', fontFamily: "'Inter', system-ui, sans-serif" }}>
+        <div style={{ minHeight: '100vh', background: '#0f172a', fontFamily: "'Inter', system-ui, sans-serif", position: 'relative' }}>
+            {/* Overlay for mobile sidebar */}
+            {isSidebarOpen && (
+                <div
+                    onClick={() => setIsSidebarOpen(false)}
+                    style={{
+                        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 40
+                    }}
+                />
+            )}
+
             {/* Sidebar */}
             <div style={{ display: 'flex', minHeight: '100vh' }}>
                 <aside style={{
@@ -96,7 +229,22 @@ export default function AdminClient({ guests, rsvps, songs, rsvpMap }: AdminClie
                     display: 'flex', flexDirection: 'column',
                     padding: '0',
                     flexShrink: 0,
-                }}>
+                    position: 'fixed', left: 0, top: 0, bottom: 0, zIndex: 50,
+                    transform: isSidebarOpen ? 'translateX(0)' : 'translateX(-100%)',
+                    transition: 'transform 0.3s ease',
+                }}
+                    className="admin-sidebar">
+                    <style>{`
+                        @media (min-width: 768px) {
+                            .admin-sidebar {
+                                position: static !important;
+                                transform: translateX(0) !important;
+                            }
+                            .mobile-menu-btn {
+                                display: none !important;
+                            }
+                        }
+                    `}</style>
                     {/* Brand */}
                     <div style={{
                         padding: '1.5rem',
@@ -120,7 +268,10 @@ export default function AdminClient({ guests, rsvps, songs, rsvpMap }: AdminClie
                         {tabs.map(tab => (
                             <button
                                 key={tab.id}
-                                onClick={() => setActiveTab(tab.id)}
+                                onClick={() => {
+                                    setActiveTab(tab.id)
+                                    setIsSidebarOpen(false)
+                                }}
                                 style={{
                                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                                     padding: '0.6rem 0.75rem',
@@ -173,13 +324,24 @@ export default function AdminClient({ guests, rsvps, songs, rsvpMap }: AdminClie
                         padding: '1.25rem 2rem',
                         borderBottom: '1px solid rgba(255,255,255,0.06)',
                         background: '#0f172a',
+                        display: 'flex', alignItems: 'center', gap: '1rem',
                     }}>
+                        <button
+                            className="mobile-menu-btn"
+                            onClick={toggleSidebar}
+                            style={{
+                                background: 'transparent', border: '1px solid rgba(255,255,255,0.1)',
+                                color: '#fff', padding: '0.4rem 0.6rem', borderRadius: '4px', cursor: 'pointer'
+                            }}
+                        >
+                            ☰
+                        </button>
                         <h1 style={{ color: '#f8fafc', fontSize: '1.1rem', fontWeight: 600, margin: 0 }}>
                             {tabs.find(t => t.id === activeTab)?.label}
                         </h1>
                     </header>
 
-                    <div style={{ flex: 1, overflowY: 'auto', padding: '2rem' }}>
+                    <div style={{ flex: 1, overflowY: 'auto', padding: '2rem 2rem 6rem 2rem' }}>
 
                         {/* ─── STATS (always visible) ─── */}
                         <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
@@ -210,6 +372,34 @@ export default function AdminClient({ guests, rsvps, songs, rsvpMap }: AdminClie
                         {/* ─── GUESTS TAB ─── */}
                         {activeTab === 'guests' && (
                             <div>
+                                {/* WhatsApp Config */}
+                                <div style={{
+                                    background: '#1e293b',
+                                    borderRadius: '10px',
+                                    padding: '1.25rem 1.5rem',
+                                    marginBottom: '1.5rem',
+                                    border: '1px solid rgba(255,255,255,0.06)',
+                                }}>
+                                    <h2 style={{ color: '#f8fafc', fontSize: '0.9rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                                        Mensaje de WhatsApp
+                                    </h2>
+                                    <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.75rem', marginBottom: '1rem' }}>
+                                        Este texto se usará al enviar el link. Usa <code>[link]</code> donde quieras que aparezca la URL.
+                                    </p>
+                                    <textarea
+                                        value={whatsappMessage}
+                                        onChange={handleTemplateChange}
+                                        style={{
+                                            width: '100%', minHeight: '120px',
+                                            padding: '0.8rem', background: '#0f172a',
+                                            border: '1px solid rgba(255,255,255,0.12)',
+                                            borderRadius: '6px', color: '#f8fafc',
+                                            fontSize: '0.875rem', outline: 'none',
+                                            resize: 'vertical', fontFamily: 'inherit'
+                                        }}
+                                    />
+                                </div>
+
                                 {/* Add guest */}
                                 <div style={{
                                     background: '#1e293b',
@@ -256,6 +446,33 @@ export default function AdminClient({ guests, rsvps, songs, rsvpMap }: AdminClie
                                         >
                                             {adding ? 'Agregando...' : '+ Agregar'}
                                         </button>
+                                        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
+                                            <input
+                                                type="file"
+                                                accept=".xlsx, .xls, .csv"
+                                                style={{ display: 'none' }}
+                                                ref={fileInputRef}
+                                                onChange={handleFileUpload}
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => fileInputRef.current?.click()}
+                                                disabled={importing}
+                                                style={{
+                                                    padding: '0.6rem 1.25rem',
+                                                    background: 'transparent',
+                                                    color: importing ? 'rgba(255,255,255,0.3)' : '#f8fafc',
+                                                    border: '1px solid rgba(255,255,255,0.2)',
+                                                    borderRadius: '6px',
+                                                    fontWeight: 500, fontSize: '0.85rem',
+                                                    cursor: importing ? 'not-allowed' : 'pointer',
+                                                    whiteSpace: 'nowrap',
+                                                    transition: 'all 0.15s',
+                                                }}
+                                            >
+                                                {importing ? 'Importando...' : '📄 Importar Excel'}
+                                            </button>
+                                        </div>
                                     </form>
                                     {addError && (
                                         <p style={{ color: '#f87171', fontSize: '0.8rem', marginTop: '0.5rem' }}>{addError}</p>
@@ -273,7 +490,7 @@ export default function AdminClient({ guests, rsvps, songs, rsvpMap }: AdminClie
                                         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
                                             <thead>
                                                 <tr style={{ background: 'rgba(255,255,255,0.03)' }}>
-                                                    {['Nombre', 'Estado RSVP', 'Link de invitación', 'Fecha'].map(h => (
+                                                    {['Nombre', 'Estado RSVP', 'Link de invitación', 'Copiar Msj', 'Fecha', ''].map((h, idx) => (
                                                         <th key={h} style={{
                                                             padding: '0.75rem 1rem',
                                                             textAlign: 'left',
@@ -328,33 +545,74 @@ export default function AdminClient({ guests, rsvps, songs, rsvpMap }: AdminClie
                                                             </td>
                                                             <td style={{ padding: '0.875rem 1rem' }}>
                                                                 <button
-                                                                    onClick={() => copyText(link, g.id)}
+                                                                    onClick={() => copyText(link, 'link-' + g.id)}
                                                                     aria-label={`Copiar link de ${g.name}`}
                                                                     style={{
                                                                         display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
                                                                         padding: '0.3rem 0.7rem',
-                                                                        background: copied === g.id ? 'rgba(74,222,128,0.12)' : 'rgba(201,168,76,0.1)',
-                                                                        border: `1px solid ${copied === g.id ? 'rgba(74,222,128,0.3)' : 'rgba(201,168,76,0.25)'}`,
+                                                                        background: copied === 'link-' + g.id ? 'rgba(74,222,128,0.12)' : 'rgba(201,168,76,0.1)',
+                                                                        border: `1px solid ${copied === 'link-' + g.id ? 'rgba(74,222,128,0.3)' : 'rgba(201,168,76,0.25)'}`,
                                                                         borderRadius: '5px',
-                                                                        color: copied === g.id ? '#4ade80' : '#c9a84c',
+                                                                        color: copied === 'link-' + g.id ? '#4ade80' : '#c9a84c',
                                                                         fontSize: '0.78rem',
                                                                         cursor: 'pointer',
                                                                         transition: 'all 0.15s',
                                                                         fontWeight: 500,
                                                                     }}
                                                                 >
-                                                                    {copied === g.id ? '✓ Copiado' : '🔗 Copiar link'}
+                                                                    {copied === 'link-' + g.id ? '✓ Copiado' : '🔗 Copiar link'}
+                                                                </button>
+                                                            </td>
+                                                            <td style={{ padding: '0.875rem 1rem' }}>
+                                                                <button
+                                                                    onClick={() => copyText(whatsappMessage.replace('[link]', link), 'msg-' + g.id)}
+                                                                    aria-label={`Copiar mensaje de ${g.name}`}
+                                                                    style={{
+                                                                        display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
+                                                                        padding: '0.3rem 0.7rem',
+                                                                        background: copied === 'msg-' + g.id ? 'rgba(74,222,128,0.12)' : 'rgba(37, 211, 102, 0.1)',
+                                                                        border: `1px solid ${copied === 'msg-' + g.id ? 'rgba(74,222,128,0.3)' : 'rgba(37, 211, 102, 0.3)'}`,
+                                                                        borderRadius: '5px',
+                                                                        color: copied === 'msg-' + g.id ? '#4ade80' : '#25D366',
+                                                                        fontSize: '0.78rem',
+                                                                        cursor: 'pointer',
+                                                                        transition: 'all 0.15s',
+                                                                        fontWeight: 500,
+                                                                    }}
+                                                                >
+                                                                    {copied === 'msg-' + g.id ? '✓ Copiado' : '💬 Copiar'}
                                                                 </button>
                                                             </td>
                                                             <td style={{ padding: '0.875rem 1rem', color: 'rgba(255,255,255,0.3)', fontSize: '0.78rem' }}>
                                                                 {new Date(g.created_at).toLocaleDateString('es-EC', { day: '2-digit', month: 'short' })}
+                                                            </td>
+                                                            <td style={{ padding: '0.875rem 1rem', textAlign: 'right' }}>
+                                                                <button
+                                                                    onClick={() => handleDeleteGuest(g.id, g.name)}
+                                                                    disabled={deletingId === g.id}
+                                                                    aria-label={`Eliminar a ${g.name}`}
+                                                                    style={{
+                                                                        background: 'none',
+                                                                        border: 'none',
+                                                                        color: deletingId === g.id ? 'rgba(248,113,113,0.3)' : '#f87171',
+                                                                        cursor: deletingId === g.id ? 'not-allowed' : 'pointer',
+                                                                        fontSize: '1rem',
+                                                                        padding: '0.4rem',
+                                                                        opacity: 0.8,
+                                                                        transition: 'opacity 0.15s',
+                                                                    }}
+                                                                    onMouseOver={e => e.currentTarget.style.opacity = '1'}
+                                                                    onMouseOut={e => e.currentTarget.style.opacity = '0.8'}
+                                                                >
+                                                                    {deletingId === g.id ? '⏳' : '🗑️'}
+                                                                </button>
                                                             </td>
                                                         </tr>
                                                     )
                                                 })}
                                                 {localGuests.length === 0 && (
                                                     <tr>
-                                                        <td colSpan={4} style={{ padding: '3rem', textAlign: 'center', color: 'rgba(255,255,255,0.25)', fontStyle: 'italic' }}>
+                                                        <td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: 'rgba(255,255,255,0.25)', fontStyle: 'italic' }}>
                                                             No hay invitados aún. Agrega el primero arriba.
                                                         </td>
                                                     </tr>

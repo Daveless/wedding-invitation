@@ -29,3 +29,31 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ guest: data })
 }
+
+export async function DELETE(request: Request) {
+    const cookieStore = cookies()
+    const session = cookieStore.get('admin_session')?.value
+
+    if (!session || session !== process.env.ADMIN_PASSWORD) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    try {
+        const { id } = await request.json()
+        if (!id) {
+            return NextResponse.json({ error: 'Guest ID required' }, { status: 400 })
+        }
+
+        const supabase = createServiceClient()
+        const { error } = await supabase
+            .from('guests')
+            .delete()
+            .eq('id', id)
+
+        if (error) throw error
+
+        return NextResponse.json({ success: true })
+    } catch (e: any) {
+        return NextResponse.json({ error: e.message || 'Error deleting guest' }, { status: 500 })
+    }
+}
