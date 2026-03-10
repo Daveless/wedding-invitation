@@ -16,6 +16,8 @@ const PARTICLES = Array.from({ length: 28 }, (_, i) => ({
 
 const CP = 51.4 // % from top where fold lines meet
 
+import { capitalizeName } from '@/lib/utils'
+
 export default function EnvelopeScene({ onOpen, guestName }: { onOpen: () => void, guestName?: string }) {
     const [phase, setPhase] = useState<0 | 1 | 2 | 3 | 4 | 5>(0)
     const [hint, setHint] = useState(false)
@@ -115,7 +117,7 @@ export default function EnvelopeScene({ onOpen, guestName }: { onOpen: () => voi
                                 lineHeight: 1.1, color: '#3d3320',
                                 padding: '0 1rem'
                             }}>
-                                {guestName || 'Estimado Invitado'}
+                                {guestName ? capitalizeName(guestName) : 'Estimado Invitado'}
                             </p>
                         </div>
                     </motion.div>

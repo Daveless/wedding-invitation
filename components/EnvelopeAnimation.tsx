@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { capitalizeName } from '@/lib/utils'
 
 interface EnvelopeAnimationProps {
     guestName: string
@@ -177,7 +178,7 @@ export default function EnvelopeAnimation({ guestName, onComplete }: EnvelopeAni
                             marginBottom: '1rem',
                             fontWeight: '700',
                         }}>
-                            {guestName}
+                            {guestName ? capitalizeName(guestName) : ''}
                         </h2>
 
                         <p style={{

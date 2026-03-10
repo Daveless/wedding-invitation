@@ -4,6 +4,7 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import RSVPForm from './RSVPForm'
 import SongRequest from './SongRequest'
+import { capitalizeName } from '@/lib/utils'
 
 // Reveal animation for newspaper sections
 function Reveal({ children, delay = 0 }: { children: React.ReactNode, delay?: number }) {
@@ -81,7 +82,7 @@ export default function HPLetter({ guestName, guestId, hasRsvp, rsvpAttending }:
                     {/* Guest Name inserted here uniquely */}
                     <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
                         <span className="font-script" style={{ fontSize: '2.5rem', color: 'var(--gold-accent)' }}>
-                            {guestName}
+                            {guestName ? capitalizeName(guestName) : 'Estimado Invitado'}
                         </span>
                     </div>
                 </Reveal>

@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { createServiceClient } from '@/lib/supabase'
 import InvitationClient from '@/components/InvitationClient'
+import { capitalizeName } from '@/lib/utils'
 import type { Metadata } from 'next'
 
 interface Props {
@@ -50,7 +51,7 @@ export default async function InvitePage({ params }: Props) {
 
     return (
         <InvitationClient
-            guestName={guest.name}
+            guestName={guest.name ? capitalizeName(guest.name) : ''}
             guestId={guest.id}
             hasRsvp={hasRsvp}
             rsvpAttending={rsvpAttending}

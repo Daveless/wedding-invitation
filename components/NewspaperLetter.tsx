@@ -8,6 +8,7 @@ import Countdown from './Countdown'
 import { useTranslation } from 'react-i18next'
 import { Bus } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { capitalizeName } from '@/lib/utils'
 
 interface Props {
     guestName: string
@@ -407,7 +408,7 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                         }}>
                             <img src="/seccion-pago.jpeg" alt="Pase" style={{ width: '100%', height: 'auto', display: 'block', marginBottom: '1.25rem', borderRadius: '4px' }} />
                             <h3 className="serif" style={{ fontSize: '1.3rem', fontStyle: 'italic', marginBottom: '0.2rem', fontWeight: 600 }}>{t('pase1Persona')}</h3>
-                            <p className="birthstone" style={{ fontSize: '2rem', color: 'var(--ink)' }}>{guestName}</p>
+                            <p className="birthstone" style={{ fontSize: '2rem', color: 'var(--ink)' }}>{capitalizeName(guestName)}</p>
                             <hr style={{ width: '40px', border: 'none', borderTop: '1px solid var(--ink)', margin: '0.5rem 0 1rem' }} />
                             <p style={{ textAlign: 'center', fontSize: '0.85rem', lineHeight: 1.6 }}>{t('paseTexto')}</p>
                         </div>
