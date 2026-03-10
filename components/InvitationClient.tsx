@@ -44,7 +44,7 @@ export default function InvitationClient({ guestName, guestId, hasRsvp, rsvpAtte
         <>
             <audio
                 ref={audioRef}
-                src="/cancion.m4a"
+                src="/cancion-2.m4a"
                 onTimeUpdate={(e) => {
                     const audio = e.currentTarget;
                     if (audio.duration && audio.currentTime >= audio.duration - 5) {
