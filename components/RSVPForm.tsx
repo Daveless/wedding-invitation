@@ -29,7 +29,7 @@ export default function RSVPForm({ guestId, initialRsvp }: any) {
                     {t('respuestaGuardada')}
                 </h4>
                 <p className="font-sans" style={{ fontSize: '0.9rem' }}>
-                    {initialRsvp !== false ? t('graciasConfirmar') : t('lamentamosNoAcompane')}
+                    {(attending === false || initialRsvp === false) ? t('lamentamosNoAcompane') : t('graciasConfirmar')}
                 </p>
             </div>
         )

@@ -42,7 +42,17 @@ export default function InvitationClient({ guestName, guestId, hasRsvp, rsvpAtte
 
     return (
         <>
-            <audio ref={audioRef} src="/cancion.m4a" loop />
+            <audio
+                ref={audioRef}
+                src="/cancion.m4a"
+                onTimeUpdate={(e) => {
+                    const audio = e.currentTarget;
+                    if (audio.duration && audio.currentTime >= audio.duration - 5) {
+                        audio.currentTime = 0;
+                        audio.play().catch(err => console.log('Loop play blocked', err));
+                    }
+                }}
+            />
 
             <AnimatePresence mode="wait">
                 {loading && (

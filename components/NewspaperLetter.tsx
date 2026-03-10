@@ -699,7 +699,17 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                         }}>
                             {t('nosAcompanas')}
                         </h2>
+                        <p style={{
+                            textAlign: 'justify',
+                            marginTop: '1.5rem',
+                            marginBottom: '1rem',
+                            fontSize: '1.2rem',
+                            color: 'var(--ink-light)'
+                        }}>
+                            {t('fechaLimiteRSVP')}
+                        </p>
                         <RSVPForm guestId={guestId} initialRsvp={hasRsvp ? rsvpAttending : null} />
+
                     </div>
                 </Reveal>
 
@@ -732,7 +742,7 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                 </Reveal>
 
                 {/* Bottom Right Corner Flourish (Mirrors Top Left) */}
-                <div style={{ position: 'absolute', right: '-25px', bottom: '-10px', opacity: 0.55, zIndex: 0 }}>
+                <div style={{ position: 'absolute', right: '10px', bottom: '-10px', opacity: 0.55, zIndex: 0 }}>
                     <img src="/adorno-esquina-2.png" alt="" style={{ width: '40vw', maxWidth: '320px', height: 'auto', transform: 'rotate(180deg)' }} />
                 </div>
             </div>
