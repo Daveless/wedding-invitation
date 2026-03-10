@@ -10,9 +10,11 @@ interface Props {
     guestId: string
     hasRsvp: boolean
     rsvpAttending: boolean | null
+    lang?: string
+    passes?: number
 }
 
-export default function InvitationClient({ guestName, guestId, hasRsvp, rsvpAttending }: Props) {
+export default function InvitationClient({ guestName, guestId, hasRsvp, rsvpAttending, lang, passes }: Props) {
     const [loading, setLoading] = useState(true)
     const [musicModal, setMusicModal] = useState(false)
     const [musicAccepted, setMusicAccepted] = useState<boolean | null>(null)
@@ -134,7 +136,7 @@ export default function InvitationClient({ guestName, guestId, hasRsvp, rsvpAtte
                 )}
 
                 {!loading && !musicModal && !opened && (
-                    <EnvelopeScene key="envelope" onOpen={() => setOpened(true)} guestName={guestName} />
+                    <EnvelopeScene key="envelope" onOpen={() => setOpened(true)} guestName={guestName} lang={lang} />
                 )}
 
                 {!loading && !musicModal && opened && (
@@ -144,6 +146,8 @@ export default function InvitationClient({ guestName, guestId, hasRsvp, rsvpAtte
                         guestId={guestId}
                         hasRsvp={hasRsvp}
                         rsvpAttending={rsvpAttending}
+                        lang={lang}
+                        passes={passes}
                     />
                 )}
             </AnimatePresence>

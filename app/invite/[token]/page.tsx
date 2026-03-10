@@ -6,6 +6,7 @@ import type { Metadata } from 'next'
 
 interface Props {
     params: { token: string }
+    searchParams?: { [key: string]: string | string[] | undefined }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -15,8 +16,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
 }
 
-export default async function InvitePage({ params }: Props) {
+export default async function InvitePage({ params, searchParams }: Props) {
     const { token } = params
+
+    const lang = typeof searchParams?.lang === 'string' ? searchParams.lang : undefined
+    const passesParam = typeof searchParams?.passes === 'string' ? searchParams.passes : undefined
+    const passes = passesParam ? parseInt(passesParam, 10) : undefined
 
     // Validate UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -55,6 +60,8 @@ export default async function InvitePage({ params }: Props) {
             guestId={guest.id}
             hasRsvp={hasRsvp}
             rsvpAttending={rsvpAttending}
+            lang={lang}
+            passes={passes}
         />
     )
 }

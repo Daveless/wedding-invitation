@@ -1,5 +1,7 @@
 {
     "guardaLaFecha": "Save the date",
+    "para": "For",
+    "tocaParaAbrir": "Tap to open",
     "nosVemos": "See you on",
     "el24deAbril": "April 24",
     "teInvitan": "Invite you to their wedding",
@@ -43,7 +45,9 @@
     "cancionCenaDesc": "Share a song you'd like to listen to during dinner. We'll create the perfect atmosphere with your suggestions.",
     "agregar": "Add",
     "pase1Persona": "Pass for 1 person",
+    "paseXPersonas": "Pass for {{count}} people",
     "paseTexto": "Each invitation has been carefully destined for a special person in our story; therefore it is personal and non-transferable.",
+    "paseTextoPlural": "This invitation is meant for you and your companions to share this special moment with us; it is personal and non-transferable.",
     "regalos": "Wedding gift",
     "regalosTexto": "Sharing this moment with you is the most important thing. If you also wish to have a gesture with us, we have decided not to receive material gifts; any contribution to our honeymoon will allow us to start our life together creating unforgettable memories.",
     "transferencia": "Bank Transfer",

@@ -17,8 +17,17 @@ const PARTICLES = Array.from({ length: 28 }, (_, i) => ({
 const CP = 51.4 // % from top where fold lines meet
 
 import { capitalizeName } from '@/lib/utils'
+import { useTranslation } from 'react-i18next'
 
-export default function EnvelopeScene({ onOpen, guestName }: { onOpen: () => void, guestName?: string }) {
+export default function EnvelopeScene({ onOpen, guestName, lang }: { onOpen: () => void, guestName?: string, lang?: string }) {
+    const { t, i18n } = useTranslation()
+
+    useEffect(() => {
+        if (lang && i18n.language !== lang) {
+            i18n.changeLanguage(lang)
+        }
+    }, [lang, i18n])
+
     const [phase, setPhase] = useState<0 | 1 | 2 | 3 | 4 | 5>(0)
     const [hint, setHint] = useState(false)
 
@@ -110,7 +119,7 @@ export default function EnvelopeScene({ onOpen, guestName }: { onOpen: () => voi
                                 fontSize: 'clamp(0.55rem, 1.5vw, 0.72rem)',
                                 letterSpacing: '5px', textTransform: 'uppercase',
                                 marginBottom: '0.4rem', color: '#7a6845',
-                            }}>Para</p>
+                            }}>{t('para')}</p>
                             <p style={{
                                 fontFamily: 'var(--font-birthstone)',
                                 fontSize: 'clamp(2.5rem, 8vw, 3.8rem)',
@@ -265,7 +274,7 @@ export default function EnvelopeScene({ onOpen, guestName }: { onOpen: () => voi
                         exit={{ opacity: 0 }}
                         transition={{ duration: 2.8, repeat: Infinity, y: { duration: 0.6 } }}
                     >
-                        Toca para abrir
+                        {t('tocaParaAbrir')}
                     </motion.p>
                 )}
             </AnimatePresence>

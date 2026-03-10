@@ -1,5 +1,7 @@
 {
     "guardaLaFecha": "Guarda la fecha",
+    "para": "Para",
+    "tocaParaAbrir": "Toca para abrir",
     "nosVemos": "Nos vemos",
     "el24deAbril": "el 24 de Abril",
     "teInvitan": "Te invitan a su boda",
@@ -43,7 +45,9 @@
     "cancionCenaDesc": "Comparte una canción que te guste escuchar durante la cena. Crearemos el ambiente perfecto con tus sugerencias.",
     "agregar": "Agregar",
     "pase1Persona": "Pase para 1 persona",
+    "paseXPersonas": "Pase para {{count}} personas",
     "paseTexto": "Cada invitación ha sido cuidadosamente destinada para una persona especial en nuestra historia; por ello es personal e intransferible.",
+    "paseTextoPlural": "Esta invitación ha sido pensada para que tú y tus acompañantes compartan con nosotros este momento especial; por ello es personal e intransferible.",
     "regalos": "Regalo de bodas",
     "regalosTexto": "Compartir este momento contigo es lo más importante. Si además deseas tener un gesto con nosotros, hemos decidido no recibir regalos materiales; cualquier contribución para nuestra luna de miel nos permitirá comenzar nuestra vida juntos creando recuerdos inolvidables.",
     "transferencia": "Transferencia Bancaria",

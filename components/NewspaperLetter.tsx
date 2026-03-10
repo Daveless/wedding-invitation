@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import RSVPForm from './RSVPForm'
 import SongRequest from './SongRequest'
@@ -15,6 +15,8 @@ interface Props {
     guestId: string
     hasRsvp: boolean
     rsvpAttending: boolean | null
+    lang?: string
+    passes?: number
 }
 
 // Fade-in-up on scroll
@@ -31,13 +33,19 @@ function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
     )
 }
 
-export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAttending }: Props) {
+export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAttending, lang, passes }: Props) {
     const { t, i18n } = useTranslation()
     const [showGifts, setShowGifts] = useState(false)
     const [showPaypal, setShowPaypal] = useState(false)
     const [showBank, setShowBank] = useState(false)
     const [needsTransport, setNeedsTransport] = useState(false)
     const [transportSaved, setTransportSaved] = useState(false)
+
+    useEffect(() => {
+        if (lang && i18n.language !== lang) {
+            i18n.changeLanguage(lang)
+        }
+    }, [lang, i18n])
 
     const handleTransportClick = async () => {
         setNeedsTransport(true)
@@ -407,10 +415,10 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                             alignItems: 'center'
                         }}>
                             <img src="/seccion-pago.jpeg" alt="Pase" style={{ width: '100%', height: 'auto', display: 'block', marginBottom: '1.25rem', borderRadius: '4px' }} />
-                            <h3 className="serif" style={{ fontSize: '1.3rem', fontStyle: 'italic', marginBottom: '0.2rem', fontWeight: 600 }}>{t('pase1Persona')}</h3>
+                            <h3 className="serif" style={{ fontSize: '1.3rem', fontStyle: 'italic', marginBottom: '0.2rem', fontWeight: 600 }}>{passes ? t('paseXPersonas', { count: passes }) : t('pase1Persona')}</h3>
                             <p className="birthstone" style={{ fontSize: '2rem', color: 'var(--ink)' }}>{capitalizeName(guestName)}</p>
                             <hr style={{ width: '40px', border: 'none', borderTop: '1px solid var(--ink)', margin: '0.5rem 0 1rem' }} />
-                            <p style={{ textAlign: 'center', fontSize: '0.85rem', lineHeight: 1.6 }}>{t('paseTexto')}</p>
+                            <p style={{ textAlign: 'center', fontSize: '0.85rem', lineHeight: 1.6 }}>{passes && passes > 1 ? t('paseTextoPlural') : t('paseTexto')}</p>
                         </div>
                     </div>
                 </Reveal>
