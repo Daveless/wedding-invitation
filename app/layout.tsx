@@ -28,8 +28,7 @@ const licorice = Licorice({
 })
 
 export const metadata: Metadata = {
-    title: 'Brenda & David — Nuestra Boda',
-    description: 'Te invitamos a nuestra boda. Guarda la fecha.'
+    title: 'David & Brenda',
 }
 
 import I18nProvider from '../components/I18nProvider'
