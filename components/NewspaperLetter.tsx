@@ -488,42 +488,48 @@ export default function NewspaperLetter({ guestName, guestId, hasRsvp, rsvpAtten
                         </p>
                     </div>
                     {/* Dress Code Circles */}
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', maxWidth: '200px' }}>
-                        {[
-                            ['#EE7EA0', '#FFA9BA', '#E2C9DC', '#E7CDF6'],
-                            ['#F6EFFF', '#CDBDEB', '#9A81B0', '#FFE6F5'],
-                            ['#EA7D70', '#F69F95', '#FBA1A0', '#FCE2E3'],
-                            ['#FFD7D6', '#FEC6BA', '#F8DCC4', '#E1CFCA'],
-                            ['#FFAF6E', '#FFC699', '#FECB7F', '#FFCC80'],
-                            ['#FFE2A6', '#FBFBBC', '#FBF8CB', '#FBF4D8'],
-                            ['#BCC07B', '#D6D7AB', '#DBE098', '#CADBBB'],
-                            ['#BCEACF', '#D5E2D3', '#E2EDE9'],
-                            ['#BBE6F0', '#C5DEF2', '#ABCDDE', '#D5EDF8'],
-                            ['#7D8BE0', '#B5BEF5', '#E4EBF1'],
-                            ['#8E715B', '#C9A98D', '#B19F9A', '#4F3F3E']
-                        ].map((colors, idx) => {
-                            let gradient = '';
-                            if (colors.length === 4) {
-                                gradient = `conic-gradient(${colors[0]} 0deg 90deg, ${colors[1]} 90deg 180deg, ${colors[2]} 180deg 270deg, ${colors[3]} 270deg 360deg)`;
-                            } else if (colors.length === 3) {
-                                gradient = `conic-gradient(${colors[0]} 0deg 120deg, ${colors[1]} 120deg 240deg, ${colors[2]} 240deg 360deg)`;
-                            } else {
-                                gradient = `conic-gradient(${colors[0]} 0deg 180deg, ${colors[1]} 180deg 360deg)`;
-                            }
-                            return (
-                                <div
-                                    key={idx}
-                                    style={{
-                                        width: '24px',
-                                        height: '24px',
-                                        borderRadius: '50%',
-                                        flexShrink: 0,
-                                        background: gradient,
-                                        boxShadow: '0 2px 4px rgba(0,0,0,0.12)'
-                                    }}
-                                />
-                            );
-                        })}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                        <p className="sans" style={{ fontSize: '0.78rem', fontWeight: 600, textAlign: 'left', textTransform: 'uppercase', color: 'var(--ink)' }}>
+                            {t('coloresPermitidos')}
+                        </p>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', maxWidth: '200px' }}>
+                            {[
+                                ['#EE7EA0', '#FFA9BA', '#E2C9DC', '#E7CDF6'],
+                                ['#F6EFFF', '#CDBDEB', '#9A81B0', '#FFE6F5'],
+                                ['#EA7D70', '#F69F95', '#FBA1A0', '#FCE2E3'],
+                                ['#FFD7D6', '#FEC6BA', '#F8DCC4', '#E1CFCA'],
+                                ['#FFAF6E', '#FFC699', '#FECB7F', '#FFCC80'],
+                                ['#FFE2A6', '#FBFBBC', '#FBF8CB', '#FBF4D8'],
+                                ['#BCC07B', '#D6D7AB', '#DBE098', '#CADBBB'],
+                                ['#BCEACF', '#D5E2D3', '#E2EDE9'],
+                                ['#BBE6F0', '#C5DEF2', '#ABCDDE', '#D5EDF8'],
+                                ['#7D8BE0', '#B5BEF5', '#E4EBF1'],
+                                ['#8E715B', '#C9A98D', '#B19F9A', '#4F3F3E'],
+                                ['#E0E0E0', '#BDBDBD', '#757575', '#424242']
+                            ].map((colors, idx) => {
+                                let gradient = '';
+                                if (colors.length === 4) {
+                                    gradient = `conic-gradient(${colors[0]} 0deg 90deg, ${colors[1]} 90deg 180deg, ${colors[2]} 180deg 270deg, ${colors[3]} 270deg 360deg)`;
+                                } else if (colors.length === 3) {
+                                    gradient = `conic-gradient(${colors[0]} 0deg 120deg, ${colors[1]} 120deg 240deg, ${colors[2]} 240deg 360deg)`;
+                                } else {
+                                    gradient = `conic-gradient(${colors[0]} 0deg 180deg, ${colors[1]} 180deg 360deg)`;
+                                }
+                                return (
+                                    <div
+                                        key={idx}
+                                        style={{
+                                            width: '24px',
+                                            height: '24px',
+                                            borderRadius: '50%',
+                                            flexShrink: 0,
+                                            background: gradient,
+                                            boxShadow: '0 2px 4px rgba(0,0,0,0.12)'
+                                        }}
+                                    />
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
                 {/*── ROW 2: Dónde + Map ──*/}
