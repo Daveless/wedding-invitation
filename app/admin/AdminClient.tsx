@@ -29,15 +29,24 @@ interface SongReq {
     guests?: { name: string } | { name: string }[] | any
 }
 
+interface TransportReq {
+    id: string
+    guest_id: string
+    needs_transport: boolean
+    submitted_at: string
+    guests?: { name: string } | { name: string }[] | any
+}
+
 interface AdminClientProps {
     guests: Guest[]
     rsvps: RSVP[]
     songs: SongReq[]
+    transports: TransportReq[]
     rsvpMap: Record<string, boolean>
 }
 
-export default function AdminClient({ guests, rsvps, songs, rsvpMap }: AdminClientProps) {
-    const [activeTab, setActiveTab] = useState<'guests' | 'rsvp' | 'songs'>('guests')
+export default function AdminClient({ guests, rsvps, songs, transports, rsvpMap }: AdminClientProps) {
+    const [activeTab, setActiveTab] = useState<'guests' | 'rsvp' | 'transport' | 'songs'>('guests')
     const [newName, setNewName] = useState('')
     const [adding, setAdding] = useState(false)
     const [localGuests, setLocalGuests] = useState<Guest[]>(guests)
@@ -206,6 +215,7 @@ export default function AdminClient({ guests, rsvps, songs, rsvpMap }: AdminClie
     const tabs = [
         { id: 'guests' as const, label: 'Invitados', count: localGuests.length },
         { id: 'rsvp' as const, label: 'Confirmaciones', count: rsvps.length },
+        { id: 'transport' as const, label: 'Transporte', count: transports.length },
         { id: 'songs' as const, label: 'Playlist', count: songs.length },
     ]
 
@@ -696,6 +706,70 @@ export default function AdminClient({ guests, rsvps, songs, rsvpMap }: AdminClie
                                         </tbody>
                                     </table>
                                 </div>
+                            </div>
+                        )}
+                        {/* ─── TRANSPORT TAB ─── */}
+                        {activeTab === 'transport' && (
+                            <div style={{
+                                background: '#1e293b',
+                                borderRadius: '10px',
+                                border: '1px solid rgba(255,255,255,0.06)',
+                                overflow: 'hidden',
+                            }}>
+                                {transports.length === 0 ? (
+                                    <div style={{ padding: '3rem', textAlign: 'center', color: 'rgba(255,255,255,0.25)', fontStyle: 'italic' }}>
+                                        Nadie ha solicitado transporte aún
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <div style={{ overflowX: 'auto' }}>
+                                            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                                                <thead>
+                                                    <tr style={{ background: 'rgba(255,255,255,0.03)' }}>
+                                                        {['Invitado', '¿Transporte?', 'Fecha'].map(h => (
+                                                            <th key={h} style={{
+                                                                padding: '0.75rem 1rem',
+                                                                textAlign: 'left',
+                                                                color: 'rgba(255,255,255,0.4)',
+                                                                fontWeight: 500,
+                                                                fontSize: '0.72rem',
+                                                                textTransform: 'uppercase',
+                                                                letterSpacing: '0.07em',
+                                                                borderBottom: '1px solid rgba(255,255,255,0.06)',
+                                                            }}>
+                                                                {h}
+                                                            </th>
+                                                        ))}
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {transports.map((t, i) => (
+                                                        <tr key={t.id} style={{ borderBottom: i < transports.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}>
+                                                            <td style={{ padding: '0.875rem 1rem', color: '#f1f5f9', fontWeight: 500 }}>
+                                                                {(Array.isArray(t.guests) ? t.guests[0]?.name : t.guests?.name) || '—'}
+                                                            </td>
+                                                            <td style={{ padding: '0.875rem 1rem' }}>
+                                                                <span style={{
+                                                                    display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
+                                                                    padding: '0.2rem 0.65rem',
+                                                                    borderRadius: '20px',
+                                                                    background: t.needs_transport ? 'rgba(96, 165, 250, 0.12)' : 'rgba(148,163,184,0.1)',
+                                                                    color: t.needs_transport ? '#60a5fa' : 'rgba(148,163,184,0.6)',
+                                                                    fontSize: '0.78rem', fontWeight: 600,
+                                                                }}>
+                                                                    {t.needs_transport ? '🚌 Sí' : '—'}
+                                                                </span>
+                                                            </td>
+                                                            <td style={{ padding: '0.875rem 1rem', color: 'rgba(255,255,255,0.3)', fontSize: '0.78rem' }}>
+                                                                {new Date(t.submitted_at).toLocaleDateString('es-EC', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         )}
 

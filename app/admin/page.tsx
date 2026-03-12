@@ -24,6 +24,12 @@ export default async function AdminPage() {
         .select('id, guest_id, song, type, submitted_at, guests(name)')
         .order('submitted_at', { ascending: false })
 
+    // Fetch all transport requests with guest name
+    const { data: transports } = await supabase
+        .from('transport_requests')
+        .select('id, guest_id, needs_transport, submitted_at, guests(name)')
+        .order('submitted_at', { ascending: false })
+
     // Map RSVP by guest_id
     const rsvpMap: Record<string, boolean> = {}
     rsvps?.forEach(r => {
@@ -35,6 +41,7 @@ export default async function AdminPage() {
             guests={guests || []}
             rsvps={rsvps || []}
             songs={songs || []}
+            transports={transports || []}
             rsvpMap={rsvpMap}
         />
     )
